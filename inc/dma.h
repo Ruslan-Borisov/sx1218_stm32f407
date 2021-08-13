@@ -21,7 +21,7 @@ extern "C" {
 
 
 extern uint8_t USART1_buff_RX[SIZE_BUFF_USART1_RX];
-extern uint8_t USART1_buff_TX[SIZE_BUFF_USART1_TX];
+extern char USART1_buff_TX[SIZE_BUFF_USART1_TX];
 
 
 /**
@@ -35,7 +35,7 @@ void DMA2_Stream2_USART_RX_Init(void);
 	
 void DMA2_Stream2_USART_TX_Init(void);
 	
-void dmaSendUSART1(char *buff, int len);
+void dmaSendUSART1(char text[], uint8_t *data);
 
 
 #ifdef __cplusplus

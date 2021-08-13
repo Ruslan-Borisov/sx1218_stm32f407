@@ -27,7 +27,7 @@ extern char SPI1_buff_RX[SIZE_BUFF_SPI1_RX];
 #define SIZE_BUFF_USART1_TX   3
 /* */	
 extern uint8_t USART1_buff_RX[SIZE_BUFF_USART1_RX];
-extern uint8_t USART1_buff_TX[SIZE_BUFF_USART1_TX];
+extern char USART1_buff_TX[SIZE_BUFF_USART1_TX];
 /* */
 extern volatile uint8_t irqFlagUSART1_TX;
 extern volatile uint8_t irqFlagUSART1_RX;

@@ -24,7 +24,7 @@
 
 /**/
 uint8_t USART1_buff_RX[SIZE_BUFF_USART1_RX];
-uint8_t USART1_buff_TX[SIZE_BUFF_USART1_TX];
+char USART1_buff_TX[SIZE_BUFF_USART1_TX];
 /**/
 char SPI1_buff_RX[SIZE_BUFF_SPI1_RX];
 /**/
@@ -45,9 +45,6 @@ int main(void)
 	EXTI_Init();
    TIM6_Init();
    spi_master_init();	
-	
-
-	
 
 	 while (1)
 {

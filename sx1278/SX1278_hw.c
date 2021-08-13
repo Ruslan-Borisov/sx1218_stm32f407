@@ -39,7 +39,7 @@ int SX1278_hw_GetDIO0() {
 	return (DIO0_GPIO_ODR & DIO0_GPIO_STATUS)==SET ? 1:0;
 }
 
-void ReadBurst( uint8_t cmd, char *buff, uint8_t size ){
+void SX1278_hw_ReadBurst_SPI( uint8_t cmd, char *buff, uint8_t size ){
 	uint8_t i;
 	SX1278_hw_SetNSS(0);
 	while (MISO_HIGH()){};
@@ -60,7 +60,7 @@ void ReadBurst( uint8_t cmd, char *buff, uint8_t size ){
 
 
 
-void WriteBurst( uint8_t addr, char *buff, uint8_t size ){
+void SX1278_hw_WriteBurst_SPI( uint8_t addr, char *buff, uint8_t size ){
 	uint8_t i;
 	SX1278_hw_SetNSS(0);
 	while (!(SPI2->SR & SPI_SR_TXE)){};	
@@ -78,7 +78,7 @@ void WriteBurst( uint8_t addr, char *buff, uint8_t size ){
 	SX1278_hw_SetNSS(1);
 }
 
-uint8_t WriteSingle(uint8_t cmd, uint8_t signal){
+uint8_t SX1278_hw_WriteSingle_SPI(uint8_t cmd, uint8_t signal){
 	SX1278_hw_SetNSS(0);
 	uint8_t temp;
 	while (!(SPI2->SR & SPI_SR_TXE)){};  
@@ -96,7 +96,7 @@ uint8_t WriteSingle(uint8_t cmd, uint8_t signal){
  }
 
 
-uint8_t SPI_ReadSignal(uint8_t cmd){
+uint8_t SPI_ReadSignal_SPI(uint8_t cmd){
 	SX1278_hw_SetNSS(0);
 	uint8_t temp;
 	while (GPIOA->IDR & MISO_HIGH()){};							

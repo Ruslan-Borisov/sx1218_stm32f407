@@ -28,8 +28,8 @@ void UART1_Init(void)
 	GPIOA->AFR[1] |= (1<<4)|(1<<5)|(1<<6); /*!< AF7 - USART1_TX >*/
 		
   /*3. Bits 2y:2y+1 MODERy[1:0]: Port A configuration bits [19;18] */	
-  GPIOA->MODER &= ~((1<<18)|(1<<19)) ;	/*!<reset>*/		
-	GPIOA->MODER |=  (1<<19) ;	/*!<Alternate function mode>*/
+   GPIOA->MODER &= ~((1<<18)|(1<<19)) ;	/*!<reset>*/		
+   GPIOA->MODER |=  (1<<19) ;	/*!<Alternate function mode>*/
 		
 	/*4. Bits 2y:2y+1 OSPEEDRy[1:0]: Port x configuration bits*/		
 	GPIOA->OSPEEDR |=(1<<19); /*!<High speed>*/
@@ -37,7 +37,7 @@ void UART1_Init(void)
 	         /*PA10   ------> USART1_RX*/ 
 		
 	/*5. Bits 31:0 AFRHy: Alternate function selection for port x bit y*/	
-  GPIOA->AFR[1] |=  (7<<8);	/*!< AF7 - USART1_RX >*/
+   GPIOA->AFR[1] |=  (7<<8);	/*!< AF7 - USART1_RX >*/
 	
 	/*6. Bits 2y:2y+1 MODERy[1:0]: Port x configuration bits */		
 	GPIOA->MODER |=  (2<<20);	/*!<Alternate function mode>*/
@@ -63,7 +63,7 @@ void UART1_Init(void)
 	USART1->CR1   &= ~(1<<12)|(1<<13); /*!< 1 Stop bit >*/   
 
   /*13. Bit 6 DMAR: DMA enable receiver */
-  USART1->CR3   |= (1<<6); /*!< Enabled >*/    
+   USART1->CR3   |= (1<<6); /*!< Enabled >*/    
 	
    /*14. Bit 7 DMAT: DMA enable transmitter */
 	USART1->CR3  |= (1<<7); /*!< Enabled >*/
