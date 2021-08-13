@@ -48,7 +48,7 @@ void spi_master_init(void)
 	SPI1->CR2 |= (1<<0);  /*!<1: Rx buffer DMA enabled> */
   
 	
-	#ifdef _SLEVE
+#ifdef _SLEVE
     	
 	/*3.Bit 8 SSI: Internal slave select*/
 	SPI1->CR1 &= ~ (1<<8);  /*!<This bit has an effect only when the SSM bit is set. 
@@ -56,9 +56,8 @@ void spi_master_init(void)
 	
 	/*4. Bit 2 MSTR: Master selection*/
 	SPI1->CR1 &= ~ (1<<2);  /*!<1: Master configuration> */
-	
-	/*5. Bits 5:3 BR[2:0]: Baud rate control*/
-   #endif
+  
+#endif
 	 
 	
 	/*8. Bit 6 SPE: SPI enable*/
