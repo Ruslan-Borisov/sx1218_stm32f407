@@ -1,16 +1,16 @@
 /**
   ******************************************************************************
-  * @file    spi_master.h
+  * @file    spi.h
   * @brief   This file contains all the function prototypes for
-  *          the spi_master.c file
+  *          the spi.c file
   ******************************************************************************
 	 * @attention
  
   ******************************************************************************
  */
 
-#ifndef __SPI_MASTER_H__
-#define __SPI_MASTER_H__
+#ifndef __SPI_H__
+#define __SPI_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +28,6 @@ void gpio_spi_master_init(void);
 }
 #endif
 
-#endif /* __SPI_MASTER_H__ */
+#endif /* __SPI_H__ */
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/

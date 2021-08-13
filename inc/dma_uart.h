@@ -1,16 +1,16 @@
 /**
   ******************************************************************************
-  * @file    dma _spi_rx_slave.h
+  * @file    dma_uart.h
   * @brief   This file contains all the function prototypes for
-  *          the dma.c file
+  *          the dma_uart.c file
   ******************************************************************************
 	 * @attention
  
   ******************************************************************************
  */
 
-#ifndef __DMA_SPI_SLAVE_H__
-#define __DMA_SPI_SLAVE_H__
+#ifndef __DMA_UART_H__
+#define __DMA_UART_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,22 +20,28 @@ extern "C" {
 #include "main.h"
 
 
-extern char SPI2_buff[SIZE_BUFF_SPI2_RX];
+extern uint8_t USART1_buff_RX[SIZE_BUFF_USART1_RX];
+extern char USART1_buff_TX[SIZE_BUFF_USART1_TX];
 
 
 /**
-  * @brief  Initializes the DMA2 Stream 3
-	* @details Working together with SPI2
+  * @brief  Initializes the DMA2 Stream 0
+	* @details Working together with ADC1,
+	* DMA operates in double buffer mode
   * @param  None
   * @retval None
   */
-extern void DMA1_Stream3_SPI_RX_Init(void);
+void DMA2_Stream2_USART_RX_Init(void);
+	
+void DMA2_Stream2_USART_TX_Init(void);
+	
+void dmaSendUSART1(char text[], uint8_t *data);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __DMA_SPI_SLAVE_H__ */
+#endif /* __DMA_UART_H__ */
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/
