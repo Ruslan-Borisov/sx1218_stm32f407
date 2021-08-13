@@ -10,7 +10,7 @@
 
 #include "flash.h"
 
-void flash_init(void)
+void unlocking_Flash(void)
 {
 	FLASH->KEYR = 0x45670123;
 	FLASH->KEYR = 0xCDEF89AB;
