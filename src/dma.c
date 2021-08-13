@@ -8,10 +8,14 @@
    * DMA configuration for STM32F407
   ******************************************************************************
  */
-
+/************************************************************
+*************************************************************/
 
 #include "dma.h"
 
+
+/************************************************************
+*************************************************************/
 void DMA2_Stream2_USART_RX_Init(void)
 {
 	/*1. Enable DMA2 clock*/
@@ -27,49 +31,50 @@ void DMA2_Stream2_USART_RX_Init(void)
 	/*3. Bits 31:0 M0A[31:0]: Memory 0 address */
 	DMA2_Stream2->M0AR = (uint32_t)&USART1_buff_RX;  /*!< > */
 
-	/*3. Bits 31:0 M1A[31:0]: Memory 1 address (used in case of Double buffer mode)*/
+	/*4. Bits 31:0 M1A[31:0]: Memory 1 address (used in case of Double buffer mode)*/
 	//DMA2_Stream2->M1AR = (uint32_t)DMA_ADC_Buff_2;  /*!< > */
 
-	/*4. Bits 15:0 NDT[15:0]: Number of data items to transfer */
+	/*5. Bits 15:0 NDT[15:0]: Number of data items to transfer */
 	DMA2_Stream2->NDTR = SIZE_BUFF_USART1_RX;  /*!< > */ 
 
-	/*3. Bit 18 DBM: Double buffer mode*/
+	/*6. Bit 18 DBM: Double buffer mode*/
 	DMA2_Stream2->CR &= ~(1<<18);  /*!<RESET> */
 
-	/*5. Bit 10 MINC: Memory increment mode */
+	/*7. Bit 10 MINC: Memory increment mode */
 	DMA2_Stream2->CR |= (1<<10); /*!<Memory address pointer is incremented after each data transfer> */ 
 
-	/*6. Bit 9 PINC: Peripheral increment mode */
+	/*8. Bit 9 PINC: Peripheral increment mode */
 	DMA2_Stream2->CR &=~ (1<<9); /*!<Peripheral address pointer is fixed> */ 
 
-	/*7. Bits 14:13 MSIZE[1:0]: Memory data size */
+	/*9. Bits 14:13 MSIZE[1:0]: Memory data size */
 	DMA2_Stream2->CR &= ~((1<<13)|(1<<14));  /*!<00: byte (8-bit)> */ 
 
-	/*8. Bits 12:11 PSIZE[1:0]: Peripheral data size */
+	/*10. Bits 12:11 PSIZE[1:0]: Peripheral data size */
 	DMA2_Stream2->CR &= ~((1<<11)|(1<<12));  /*!<00: byte (8-bit)> */ 
 
-	/*9. Bit 8 CIRC: Circular mode */
+	/*11. Bit 8 CIRC: Circular mode */
 	DMA2_Stream2->CR|= (1<<8); /*!<Circular mode enabled> */ 
 
-	/*10. Bits 7:6 DIR[1:0]: Data transfer direction */
+	/*12. Bits 7:6 DIR[1:0]: Data transfer direction */
 	DMA2_Stream2->CR &= ~((1<<6)|(1<<7)); /*!<Peripheral-to-memory(reset)> */ 
 
-	/*11. Bits 17:16 PL[1:0]: Priority level*/
+	/*13. Bits 17:16 PL[1:0]: Priority level*/
 	DMA2_Stream2->CR|= (1<<17); /*!<High> */ 
 
-	/*12. Bit 4 TCIE: Transfer complete interrupt enable*/
+	/*14. Bit 4 TCIE: Transfer complete interrupt enable*/
 	DMA2_Stream2->CR|= (1<<4); /*!<TC interrupt enabled> */ 
 
-	/*12. 	Bit 0 EN: Stream enable / flag stream ready when read low*/
+	/*15. 	Bit 0 EN: Stream enable / flag stream ready when read low*/
 	DMA2_Stream2->CR|= (1<<0); /*!<Stream enabled> */ 
 
 	NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 	NVIC_SetPriority(DMA2_Stream2_IRQn,1);
 }
-
+/************************************************************
+*************************************************************/
 void DMA2_Stream7_USART_TX_Init(void)
 {
-	/*1. Enable DMA2 clock*/
+	/* Enable DMA2 clock*/
 	RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
 
 	/*1. Bits 27:25 CHSEL[2:0]: Channel selection */
@@ -82,47 +87,48 @@ void DMA2_Stream7_USART_TX_Init(void)
 	/*3. Bits 31:0 M0A[31:0]: Memory 0 address */
 	DMA2_Stream7->M0AR = (uint32_t)&USART1_buff_TX;  /*!< > */
 
-	/*3. Bits 31:0 M1A[31:0]: Memory 1 address (used in case of Double buffer mode)*/
+	/*4. Bits 31:0 M1A[31:0]: Memory 1 address (used in case of Double buffer mode)*/
 	//DMA2_Stream2->M1AR = (uint32_t)DMA_ADC_Buff_2;  /*!< > */
 
-	/*4. Bits 15:0 NDT[15:0]: Number of data items to transfer */
+	/*5. Bits 15:0 NDT[15:0]: Number of data items to transfer */
 	DMA2_Stream7->NDTR = SIZE_BUFF_USART1_TX;  /*!< > */ 
 
-	/*3. Bit 18 DBM: Double buffer mode*/
+	/*6. Bit 18 DBM: Double buffer mode*/
 	DMA2_Stream7->CR &= ~(1<<18);  /*!<RESET> */
 
-	/*5. Bit 10 MINC: Memory increment mode */
+	/*7. Bit 10 MINC: Memory increment mode */
 	DMA2_Stream7->CR |= (1<<10); /*!<Memory address pointer is incremented after each data transfer> */ 
 
-	/*6. Bit 9 PINC: Peripheral increment mode */
+	/*8. Bit 9 PINC: Peripheral increment mode */
 	DMA2_Stream7->CR &=~ (1<<9); /*!<Peripheral address pointer is fixed> */ 
 
-	/*7. Bits 14:13 MSIZE[1:0]: Memory data size */
+	/*9. Bits 14:13 MSIZE[1:0]: Memory data size */
 	DMA2_Stream7->CR &= ~((1<<13)|(1<<14));  /*!<00: byte (8-bit)> */ 
 
-	/*8. Bits 12:11 PSIZE[1:0]: Peripheral data size */
+	/*10. Bits 12:11 PSIZE[1:0]: Peripheral data size */
 	DMA2_Stream7->CR &= ~((1<<11)|(1<<12));  /*!<00: byte (8-bit)> */ 
 
-	/*9. Bit 8 CIRC: Circular mode */
+	/*11. Bit 8 CIRC: Circular mode */
 	DMA2_Stream7->CR &= ~(1<<8); /*!<Circular mode disabled> */ 
 
-	/*10. Bits 7:6 DIR[1:0]: Data transfer direction */
+	/*12. Bits 7:6 DIR[1:0]: Data transfer direction */
 	DMA2_Stream7->CR &=~ ((1<<6)|(1<<7)); /*!<reset> */ 
 	DMA2_Stream7->CR |= (1<<6); /*!<01: Memory-to-peripheral> */ 
 
-	/*11. Bits 17:16 PL[1:0]: Priority level*/
+	/*13. Bits 17:16 PL[1:0]: Priority level*/
 	DMA2_Stream7->CR|= (1<<17); /*!<High> */ 
 
-	/*12. Bit 4 TCIE: Transfer complete interrupt enable*/
+	/*14. Bit 4 TCIE: Transfer complete interrupt enable*/
 	DMA2_Stream7->CR|= (1<<4); /*!<TC interrupt enabled> */ 
 
-	/*12. 	Bit 0 EN: Stream enable / flag stream ready when read low*/
+	/*15. 	Bit 0 EN: Stream enable / flag stream ready when read low*/
 	DMA2_Stream7->CR &=~ (1<<0); /*!<Stream disabled> */ 
 
 	NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 	NVIC_SetPriority(DMA2_Stream7_IRQn,1);
 }
-
+/************************************************************
+*************************************************************/
 void dmaSendUSART1(char text[], uint8_t *data)
 {
 	static uint8_t len;
@@ -145,6 +151,7 @@ void dmaSendUSART1(char text[], uint8_t *data)
 	DMA2_Stream7->NDTR = len+4; 
 	DMA2_Stream7->CR |=  (1<<0); /*!<enabled> */
 }
-
+/************************************************************
+*************************************************************/
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/

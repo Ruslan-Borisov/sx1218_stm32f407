@@ -8,13 +8,16 @@
    * SPI configuration for STM32F407
   ******************************************************************************
  */
-
+/************************************************************
+*************************************************************/
 
 #include "spi_master.h"
 #include "dma _spi_rx_master.h"
 
-
 #define _SLEVE
+
+/************************************************************
+*************************************************************/
 
 void spi_master_init(void)
 {
@@ -64,49 +67,53 @@ void spi_master_init(void)
 	DMA2_Stream0_SPI_RX_Init();
 
 }
-
+/************************************************************
+*************************************************************/
 void gpio_spi_master_init(void)
 {
-/*Enable GPIOA  clock*/
+	/*Enable GPIOA  clock*/
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-	
-	  /* PA5   ------> SPI1_SCK*/	
+
+	/* PA5   ------> SPI1_SCK*/	
 	/*2. Bits 31:0 AFRуHy: Alternate function selection for port B bit [23:20]*/	
 	GPIOA->AFR[0] &=~ ((1<<20)|(1<<21)|(1<<22)|(1<<23)); /*!< reset>*/
 	GPIOA->AFR[0] |= (1<<20)|(1<<22); /*!< 0101: AF5 - SPI1_SCK >*/
-		
+
 	/*3. Bits 2y:2y+1 MODERy[1:0]: Port B configuration bits [10:11]] */	
 	GPIOA->MODER &= ~((1<<10)|(1<<11)) ;	/*!<reset>*/		
 	GPIOA->MODER |=  (1<<11) ;	/*!<Alternate function mode>*/
-		
+
 	/*4. Bits 2y:2y+1 OSPEEDRy[1:0]: Port B configuration bits [10:11]]*/		
 	GPIOA->OSPEEDR |=(1<<10)|(1<<11); /*!<11: Very high speed>*/
-	
+
 	/* PA6  ------> SPI1_MISO*/	
 	/*2. Bits 31:0 AFRHy: Alternate function selection for port C bit [24;27]*/	
 	GPIOA->AFR[0] &= ~((1<<24)|(1<<25)|(1<<26)|(1<<27)); /*!< reset>*/
 	GPIOA->AFR[0] |= (1<<24)|(1<<26); /*!< 0101: AF5 - SPI1_MISO >*/
-		
+
 	/*3. Bits 2y:2y+1 MODERy[1:0]: Port C configuration bits [12;13] */	
 	GPIOA->MODER &= ~((1<<12)|(1<<13)) ;	/*!<reset>*/		
 	GPIOA->MODER |=  (1<<13) ;	/*!<10 Alternate function mode>*/
-		
+
 	/*4. Bits 2y:2y+1 OSPEEDRy[1:0]: Port C configuration bits [12;13]*/		
 	GPIOA->OSPEEDR |=(1<<12)|(1<<13); /*!<11: Very high speed>*/
-	
+
 	/* PA7   ------> SPI1_MOSI*/	
 	/*2. Bits 31:0 AFRHy: Alternate function selection for port C bit [31;27]*/	
 	//GPIOA->AFR[0] &= ~((1<<12)|(1<<13)|(1<<14)|(1<<15)); /*!< reset>*/
 	GPIOA->AFR[0] |= (1<<27)|(1<<29); /*!< 0101: AF5 - SPI1_MOSI >*/
-		
+
 	/*3. Bits 2y:2y+1 MODERy[1:0]: Port C configuration bits [14;15] */	
 	GPIOA->MODER &= ~((1<<14)|(1<<15)) ;	/*!<reset>*/		
 	GPIOA->MODER |=  (1<<15) ;	/*!<Alternate function mode>*/
-		
+
 	/*4. Bits 2y:2y+1 OSPEEDRy[1:0]: Port C configuration bits [14;15]*/		
 	GPIOA->OSPEEDR |=(1<<14)|(1<<15); /*!<11: Very high speed>*/
 
 }
+
+/************************************************************
+*************************************************************/
 
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/
