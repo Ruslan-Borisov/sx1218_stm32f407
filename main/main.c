@@ -10,16 +10,19 @@
 
 #include <stdint.h>
 #include "main.h"
-#include "dma.h"
+#include "dma_uart.h"
 #include "usart.h"
 #include "stm32f4xx_it.h"
 #include "rcc.h"
-#include "spi_master.h"
+#include "spi.h"
 #include "gpio.h"
 #include "tim.h"
 #include "SX1278_hw.h"
 #include "SX1278.h"
-#include "dma _spi_rx_master.h"
+#include "dma _spi.h"
+
+
+#define _SLEVE
 
 
 /**/
@@ -34,7 +37,7 @@ volatile uint8_t irqFlagUSART1_RX;
 volatile uint8_t irqFlagSPI_RX;
 /**/
 volatile uint8_t irqFlagEXTI_DIO0;
-
+/**/
 
 int main(void)
 {

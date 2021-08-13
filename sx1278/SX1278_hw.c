@@ -12,7 +12,7 @@
 
 #include "tim.h"
 #include "SX1278_hw.h"
-#include "spi_master.h"
+#include "spi.h"
 #include "main.h"
 #include "gpio.h"
 
