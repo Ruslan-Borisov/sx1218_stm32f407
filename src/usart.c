@@ -77,6 +77,7 @@ void UART1_Init(void)
 	//NVIC_SetPriority(USART1_IRQn,1);
 
 	DMA2_Stream2_USART_RX_Init();
+	DMA2_Stream7_USART_TX_Init();
 
 }
 	

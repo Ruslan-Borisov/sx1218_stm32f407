@@ -25,6 +25,7 @@ extern "C" {
   */
 void UART1_Init(void);
 extern void DMA2_Stream2_USART_RX_Init(void);
+extern void DMA2_Stream7_USART_TX_Init(void);
 	
 #ifdef __cplusplus
 }
