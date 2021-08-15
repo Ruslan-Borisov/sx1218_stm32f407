@@ -23,7 +23,7 @@ void spi_master_init(void)
 	
 	/*1. Enable SPI1  clock*/
 	
-	volatile uint32_t tmp;
+	 volatile uint32_t tmp;
    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
    tmp = RCC->APB2ENR;
    (void)tmp;

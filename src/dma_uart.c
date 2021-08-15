@@ -147,7 +147,7 @@ void dmaSendUSART1(char text[], uint8_t *data)
 	//buff[len+4] = {"\n"};
 	
 	DMA2_Stream7->CR &=~ (1<<0); /*!<Stream disabled> */
-   DMA2_Stream7->M0AR = (uint32_t)buff; /*!< > */
+  DMA2_Stream7->M0AR = (uint32_t)buff; /*!< > */
 	DMA2_Stream7->NDTR = len+4; 
 	DMA2_Stream7->CR |=  (1<<0); /*!<enabled> */
 }
