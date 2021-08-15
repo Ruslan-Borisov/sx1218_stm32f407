@@ -29,7 +29,7 @@
 uint8_t USART1_buff_RX[SIZE_BUFF_USART1_RX];
 char USART1_buff_TX[SIZE_BUFF_USART1_TX];
 /**/
-char SPI1_buff_RX[SIZE_BUFF_SPI1_RX];
+char SPI1_buff_RX[SIZE_BUFF_SPI1_RX]; 
 /**/
 volatile uint8_t irqFlagUSART1_TX;
 volatile uint8_t irqFlagUSART1_RX;
