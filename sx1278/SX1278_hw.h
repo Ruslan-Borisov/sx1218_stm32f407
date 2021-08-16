@@ -77,7 +77,7 @@ void ReadBurst( uint8_t cmd, char *buff, uint8_t size);
 
 uint8_t WriteSingle(uint8_t cmd, uint8_t signal);
 
-uint8_t SPI_ReadSignal(uint8_t cmd);
+uint8_t SPI_ReadSignal_SPI(uint8_t cmd);
 
 #ifdef __cplusplus
 }

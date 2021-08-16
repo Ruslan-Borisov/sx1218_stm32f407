@@ -35,7 +35,7 @@ void DMA2_Stream2_USART_RX_Init(void);
 	
 void DMA2_Stream2_USART_TX_Init(void);
 	
-void dmaSendUSART1(char text[], uint8_t *data);
+void dmaSendUSART1(char text[], uint8_t data);
 
 
 #ifdef __cplusplus

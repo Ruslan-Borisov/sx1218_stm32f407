@@ -105,17 +105,12 @@ uint8_t SX1278_hw_WriteSingle_SPI(uint8_t cmd, uint8_t signal){
 uint8_t SPI_ReadSignal_SPI(uint8_t cmd){
 	SX1278_hw_SetNSS(0);
 	uint8_t temp;
-	while (GPIOA->IDR & MISO_HIGH()){};							
-	while (!(SPI2->SR & SPI_SR_TXE)){}; 
-	*((__IO uint8_t *)&SPI2->DR) = (cmd | 0x80);
-	while (SPI2->SR & SPI_SR_BSY){};
-	while (!(SPI2->SR & SPI_SR_RXNE)){}; 
-	cmd = *((__IO uint8_t *)&SPI2->DR);
-	while (!(SPI2->SR & SPI_SR_TXE)){};	 
-	*((__IO uint8_t *)&SPI2->DR) = 0x00;
-	while (SPI2->SR & SPI_SR_BSY){};
-	while (!(SPI2->SR & SPI_SR_RXNE)){};
-	temp = *((__IO uint8_t *)&SPI2->DR);
+	//while (GPIOA->IDR & MISO_HIGH()){};							
+	while (!(SPI1->SR & SPI_SR_TXE)){}; 
+	*((__IO uint8_t *)&SPI1->DR) = cmd;
+	while (SPI1->SR & SPI_SR_BSY){};
+	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+	temp = *((__IO uint8_t *)&SPI1->DR);
 	SX1278_hw_SetNSS(1);
 	return temp;	
 }

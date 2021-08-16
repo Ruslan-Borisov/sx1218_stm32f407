@@ -22,7 +22,7 @@
 #include "dma _spi.h"
 
 
-#define _SLEVE
+//#define _SLEVE
 
 
 /**/
@@ -38,21 +38,43 @@ volatile uint8_t irqFlagSPI_RX;
 /**/
 volatile uint8_t irqFlagEXTI_DIO0;
 /**/
+uint8_t rw_test;
+uint8_t cmd_test;
+uint8_t vale_test;
+
+char set_test[] = "Set test";
+
+uint8_t signal_lora_test;
+
+
+
 
 int main(void)
 {
  
 	RCC_Init();
-  UART1_Init();
+   UART1_Init();
 	GPIO_Init();
 	EXTI_Init();
-  TIM6_Init();
-  spi_master_init();	
-
+   TIM6_Init();
+	
+	SX1278_hw_init();
+	timDelayMs(10);
+	
+   spi_master_init();	
+   timDelayMs(200);
 	 while (1)
 {
 	if(irqFlagUSART1_RX ==1)
   {
+	  dmaSendUSART1(set_test, 0x01);
+	  rw_test = USART1_buff_RX[0];
+	  cmd_test = USART1_buff_RX[1];
+	  vale_test = USART1_buff_RX[2];
+	  if(rw_test==0)
+     {
+	    signal_lora_test = SPI_ReadSignal_SPI(cmd_test); 
+	  }
 	 irqFlagUSART1_RX = 0;
 	}
 
