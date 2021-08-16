@@ -43,7 +43,7 @@ void spi_master_init(void)
 	SPI1->CR1  |= (1<<4);  /*!<010: fPCLK/8> */
 	
 	/*7. Bit 0 RXDMAEN: Rx buffer DMA enable*/
-	SPI1->CR2 |= (1<<0);  /*!<1: Rx buffer DMA enabled> */
+	SPI1->CR2 &= ~ (1<<0);  /*!<1: Rx buffer DMA enabled> */
   
 	
 #ifdef _SLEVE
@@ -61,7 +61,7 @@ void spi_master_init(void)
 	/*8. Bit 6 SPE: SPI enable*/
 	SPI1->CR1 |= (1<<6);  /*!<1: Peripheral enabled> */
 	
-	DMA2_Stream0_SPI_RX_Init();
+	//DMA2_Stream0_SPI_RX_Init();
 
 }
 /************************************************************
