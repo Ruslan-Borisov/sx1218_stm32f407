@@ -36,6 +36,8 @@ extern volatile uint8_t irqFlagEXTI_DIO0;
 /**/
 extern volatile uint8_t irqFlagSPI_RX;
 /**/
+extern uint8_t sizeLen;	
+	
 #ifdef __cplusplus
 }
 #endif

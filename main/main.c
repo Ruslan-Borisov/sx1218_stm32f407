@@ -41,13 +41,13 @@ volatile uint8_t irqFlagEXTI_DIO0;
 uint8_t rw_test;
 uint8_t cmd_test;
 uint8_t vale_test;
-
-char set_test[] = "Set test";
-
+/**/
+uint8_t set_test[256];
+/**/
 uint8_t signal_lora_test;
-
-
-
+/**/
+uint8_t sizeLen;	
+/**/
 
 int main(void)
 {
@@ -61,25 +61,29 @@ int main(void)
 	SX1278_hw_init();
 	timDelayMs(10);
 	
+	uint8_t sizeLen;
+	
    spi_master_init();	
    timDelayMs(200);
+	
+	SX1278_hw_comand_SPI(1, 0x01, 0x08);
+
 	 while (1)
 {
-	if(irqFlagUSART1_RX ==1)
+
+	if(irqFlagUSART1_RX==1)
   {
-	  dmaSendUSART1(set_test, 0x01);
+	  
 	  rw_test = USART1_buff_RX[0];
 	  cmd_test = USART1_buff_RX[1];
 	  vale_test = USART1_buff_RX[2];
 	  if(rw_test==0)
      {
-	    signal_lora_test = SPI_ReadSignal_SPI(cmd_test); 
+	    signal_lora_test = SPI_ReadSignal_SPI(cmd_test);
 	  }
 	 irqFlagUSART1_RX = 0;
 	}
 
-   
-	
 }
  
 }

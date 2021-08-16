@@ -40,25 +40,12 @@ void spi_master_init(void)
 	SPI1->CR1 |= (1<<2);  /*!<1: Master configuration> */
 	
 	/*5. Bits 5:3 BR[2:0]: Baud rate control*/
-	SPI1->CR1  &= ~ (1<<3)|(1<<4)|(1<<5);   /*!<111: fPCLK/256> */
+	SPI1->CR1  |= (1<<3)|(1<<4)|(1<<5);   /*!<111: fPCLK/256> */
 	//SPI1->CR1  |= (1<<4);  /*!<010: fPCLK/8> */
 	
 	/*7. Bit 0 RXDMAEN: Rx buffer DMA enable*/
 	SPI1->CR2  &= ~ (1<<0);  /*!<1: Rx buffer DMA enabled> */
   
-	
-//#ifdef _SLEVE
-//    	
-//	/*3.Bit 8 SSI: Internal slave select*/
-//	SPI1->CR1 &= ~ (1<<8);  /*!<This bit has an effect only when the SSM bit is set. 
-//	The value of this bit is forced onto the NSS pin and the IO value of the NSS pin is ignored > */
-//	
-//	/*4. Bit 2 MSTR: Master selection*/
-//	SPI1->CR1 &= ~ (1<<2);  /*!<1: Master configuration> */
-//  
-//#endif
-	 
-	
 	/*8. Bit 6 SPE: SPI enable*/
 	SPI1->CR1 |= (1<<6);  /*!<1: Peripheral enabled> */
 

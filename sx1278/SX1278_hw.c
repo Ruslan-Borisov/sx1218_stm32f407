@@ -46,9 +46,11 @@ int SX1278_hw_GetDIO0() {
 /************************************************************
 *************************************************************/
 void SX1278_hw_ReadBurst_SPI( uint8_t cmd, char *buff, uint8_t size ){
+	
+	
 	uint8_t i;
 	SX1278_hw_SetNSS(0);
-	while (MISO_HIGH()){};
+	//while (MISO_HIGH()){};
 	while (!(SPI2->SR & SPI_SR_TXE)){};
 	*((__IO uint8_t *)&SPI2->DR) = (cmd | 0x80);
 	while (SPI2->SR & SPI_SR_BSY){};
@@ -103,16 +105,51 @@ uint8_t SX1278_hw_WriteSingle_SPI(uint8_t cmd, uint8_t signal){
 /************************************************************
 *************************************************************/
 uint8_t SPI_ReadSignal_SPI(uint8_t cmd){
-	SX1278_hw_SetNSS(0);
 	uint8_t temp;
-	//while (GPIOA->IDR & MISO_HIGH()){};							
-	while (!(SPI1->SR & SPI_SR_TXE)){}; 
-	*((__IO uint8_t *)&SPI1->DR) = cmd;
-	while (SPI1->SR & SPI_SR_BSY){};
-	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
-	temp = *((__IO uint8_t *)&SPI1->DR);
-	SX1278_hw_SetNSS(1);
-	return temp;	
+	   SX1278_hw_SetNSS(0);
+	   while(!(SPI1->SR & SPI_SR_TXE)){}
+      *((__IO uint8_t *)&SPI1->DR) = cmd;
+      while (!(SPI1->SR & SPI_SR_RXNE)){}
+      while ( SPI1->SR & SPI_SR_BSY )
+      {
+            (void)SPI1->DR;
+      }
+     while(!(SPI1->SR & SPI_SR_TXE)){}
+     *((__IO uint8_t *)&SPI1->DR) = 0xFF;
+     while (!(SPI1->SR & SPI_SR_RXNE)){}
+     temp = (uint8_t)SPI1->DR;
+ 
+     SX1278_hw_SetNSS(1);		
+}
+
+
+void SX1278_hw_comand_SPI(uint8_t rw, uint8_t adr, uint8_t cmd)
+{
+	SX1278_hw_SetNSS(0);
+	
+	   cmd = (rw==0)? cmd: (cmd|0x80);
+	   while(!(SPI1->SR & SPI_SR_TXE)){}
+      *((__IO uint8_t *)&SPI1->DR) = adr;
+     // while (!(SPI1->SR & SPI_SR_RXNE)){}
+      while ( SPI1->SR & SPI_SR_BSY )
+      {
+            (void)SPI1->DR;
+      }
+     while(!(SPI1->SR & SPI_SR_TXE)){}
+     *((__IO uint8_t *)&SPI1->DR) = cmd;
+	
+	   while ( SPI1->SR & SPI_SR_BSY )
+      {
+            (void)SPI1->DR;
+      }
+     SX1278_hw_SetNSS(1);	
+ 
+
+
+
+
+
+
 }
 /************************************************************
 *************************************************************/

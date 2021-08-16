@@ -75,9 +75,13 @@ void WriteBurst( uint8_t addr, char *buff, uint8_t size);
 
 void ReadBurst( uint8_t cmd, char *buff, uint8_t size);
 
-uint8_t WriteSingle(uint8_t cmd, uint8_t signal);
+//uint8_t WriteSingle(uint8_t cmd, uint8_t signal);
+
+void SX1278_hw_WriteBurst_SPI( uint8_t addr, char *buff, uint8_t size );
 
 uint8_t SPI_ReadSignal_SPI(uint8_t cmd);
+
+void SX1278_hw_comand_SPI(uint8_t rw, uint8_t adr, uint8_t cmd);
 
 #ifdef __cplusplus
 }

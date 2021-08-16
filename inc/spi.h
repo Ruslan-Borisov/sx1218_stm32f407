@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-#define MISO_HIGH()      (GPIOC->IDR & GPIO_IDR_IDR_2)
+//#define MISO_HIGH()      (GPIOC->IDR & GPIO_IDR_IDR_2)
 
 #include "main.h"
 
