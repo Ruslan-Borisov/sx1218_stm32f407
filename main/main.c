@@ -57,17 +57,13 @@ int main(void)
 	GPIO_Init();
 	EXTI_Init();
    TIM6_Init();
-	
+  LORA_ADD_SET();
+	timDelayMs(100);
 	SX1278_hw_init();
-	timDelayMs(10);
-	
-	uint8_t sizeLen;
-	
    spi_master_init();	
-   timDelayMs(200);
+   timDelayMs(1000);
 	
-	SX1278_hw_comand_SPI(1, 0x01, 0x08);
-
+	
 	 while (1)
 {
 
@@ -79,8 +75,12 @@ int main(void)
 	  vale_test = USART1_buff_RX[2];
 	  if(rw_test==0)
      {
-	    signal_lora_test = SPI_ReadSignal_SPI(cmd_test);
+	    signal_lora_test = SX1276_ReadSingle(cmd_test); 
 	  }
+		 if(rw_test==1)
+     {
+	    
+	    }
 	 irqFlagUSART1_RX = 0;
 	}
 

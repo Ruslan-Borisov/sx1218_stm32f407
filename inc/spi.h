@@ -22,7 +22,7 @@ extern "C" {
 
 void spi_master_init(void);
 void gpio_spi_master_init(void);
-
+void spiSET_RESET(uint8_t vale);
 
 #ifdef __cplusplus
 }

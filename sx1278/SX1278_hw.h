@@ -15,8 +15,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
 
+#include "main.h"
+
+#define SPI_STATE_READY  (1<<15)
+
+#define SPI1_DR_8bit 			*((__IO uint8_t *)&SPI1->DR)
+
+
+#define 	WRITE_SINGLE     				0x80
+#define 	READ_SINGLE     				0x00
 
 /**
  * \brief Initialize hardware layer
@@ -48,15 +56,6 @@ void SX1278_hw_Reset();
 
 
 /**
- * \brief ms delay
- *
- * Milisecond delay.
- *
- * \param[in]   msec 		Number of milliseconds to wait
- */
-void SX1278_hw_DelayMs(uint32_t msec);
-
-/**
  * \brief Reads DIO0 state
  *
  * Reads LoRa DIO0 state using GPIO.
@@ -68,20 +67,14 @@ void SX1278_hw_DelayMs(uint32_t msec);
 int SX1278_hw_GetDIO0();
 
 
-
 int SPI_GetState();
 
-void WriteBurst( uint8_t addr, char *buff, uint8_t size);
+uint8_t SX1276_WriteSingle(uint8_t command, uint8_t value);
 
-void ReadBurst( uint8_t cmd, char *buff, uint8_t size);
+uint8_t SX1276_ReadSingle(uint8_t command);
 
-//uint8_t WriteSingle(uint8_t cmd, uint8_t signal);
 
-void SX1278_hw_WriteBurst_SPI( uint8_t addr, char *buff, uint8_t size );
 
-uint8_t SPI_ReadSignal_SPI(uint8_t cmd);
-
-void SX1278_hw_comand_SPI(uint8_t rw, uint8_t adr, uint8_t cmd);
 
 #ifdef __cplusplus
 }

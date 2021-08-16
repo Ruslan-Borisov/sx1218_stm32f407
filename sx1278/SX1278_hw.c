@@ -13,10 +13,9 @@
 #include "tim.h"
 #include "SX1278_hw.h"
 #include "spi.h"
-#include "main.h"
+
 #include "gpio.h"
 
-#define SPI_STATE_READY  (1<<15)
 
 /************************************************************
 *************************************************************/
@@ -45,116 +44,84 @@ int SX1278_hw_GetDIO0() {
 }
 /************************************************************
 *************************************************************/
-void SX1278_hw_ReadBurst_SPI( uint8_t cmd, char *buff, uint8_t size ){
-	
-	
-	uint8_t i;
-	SX1278_hw_SetNSS(0);
-	//while (MISO_HIGH()){};
-	while (!(SPI2->SR & SPI_SR_TXE)){};
-	*((__IO uint8_t *)&SPI2->DR) = (cmd | 0x80);
-	while (SPI2->SR & SPI_SR_BSY){};
-	while (!(SPI2->SR & SPI_SR_RXNE)){}; 
-   *((__IO uint8_t *)&SPI2->DR);		
-	for(i = 0; i < size;i ++){
-	   while (!(SPI2->SR & SPI_SR_TXE)){};	
-	     *((__IO uint8_t *)&SPI2->DR);		
-			while (SPI2->SR & SPI_SR_BSY){};
-			while (!(SPI2->SR & SPI_SR_RXNE)){};
-			buff[i] = *((__IO uint8_t *)&SPI2->DR);		
-		}
-	SX1278_hw_SetNSS(1);
-}
-/************************************************************
-*************************************************************/
-void SX1278_hw_WriteBurst_SPI( uint8_t addr, char *buff, uint8_t size ){
-	uint8_t i;
-	SX1278_hw_SetNSS(0);
-	while (!(SPI2->SR & SPI_SR_TXE)){};	
-	*((__IO uint8_t *)&SPI2->DR) = (addr | 0x80);
-	while (SPI2->SR & SPI_SR_BSY){};		
-	while (!(SPI2->SR & SPI_SR_RXNE)){}; 
-	*((__IO uint8_t *)&SPI2->DR);	
-	for(i = 0;i < size;i ++){
-			while (!(SPI2->SR & SPI_SR_TXE)){};	
-			*((__IO uint8_t *)&SPI2->DR) = buff[i]; 
-			while (SPI2->SR & SPI_SR_BSY){};
-			while (!(SPI2->SR & SPI_SR_RXNE)){};
-			*((__IO uint8_t *)&SPI2->DR);	;	
-		}
-	SX1278_hw_SetNSS(1);
-}
-/************************************************************
-*************************************************************/
-uint8_t SX1278_hw_WriteSingle_SPI(uint8_t cmd, uint8_t signal){
-	SX1278_hw_SetNSS(0);
-	uint8_t temp;
-	while (!(SPI2->SR & SPI_SR_TXE)){};  
-	*((__IO uint8_t *)&SPI2->DR) = (cmd | 0x80);
-	while (SPI2->SR & SPI_SR_BSY){};
-	while (!(SPI2->SR & SPI_SR_RXNE)){}; 
-	temp=*((__IO uint8_t *)&SPI2->DR);
-	while (!(SPI2->SR & SPI_SR_TXE)){};	 
-	*((__IO uint8_t *)&SPI2->DR) = signal;
-	while (SPI2->SR & SPI_SR_BSY){};
-	while (!(SPI2->SR & SPI_SR_RXNE)){}; 
-	temp=*((__IO uint8_t *)&SPI2->DR);	
-   SX1278_hw_SetNSS(1);
-   return temp;			
- }
-/************************************************************
-*************************************************************/
-uint8_t SPI_ReadSignal_SPI(uint8_t cmd){
-	uint8_t temp;
-	   SX1278_hw_SetNSS(0);
-	   while(!(SPI1->SR & SPI_SR_TXE)){}
-      *((__IO uint8_t *)&SPI1->DR) = cmd;
-      while (!(SPI1->SR & SPI_SR_RXNE)){}
-      while ( SPI1->SR & SPI_SR_BSY )
-      {
-            (void)SPI1->DR;
-      }
-     while(!(SPI1->SR & SPI_SR_TXE)){}
-     *((__IO uint8_t *)&SPI1->DR) = 0xFF;
-     while (!(SPI1->SR & SPI_SR_RXNE)){}
-     temp = (uint8_t)SPI1->DR;
- 
-     SX1278_hw_SetNSS(1);		
-}
 
-
-void SX1278_hw_comand_SPI(uint8_t rw, uint8_t adr, uint8_t cmd)
+uint8_t SX1276_WriteSingle(uint8_t command, uint8_t value) 													
 {
+	uint8_t temp;
 	SX1278_hw_SetNSS(0);
-	
-	   cmd = (rw==0)? cmd: (cmd|0x80);
-	   while(!(SPI1->SR & SPI_SR_TXE)){}
-      *((__IO uint8_t *)&SPI1->DR) = adr;
-     // while (!(SPI1->SR & SPI_SR_RXNE)){}
-      while ( SPI1->SR & SPI_SR_BSY )
-      {
-            (void)SPI1->DR;
-      }
-     while(!(SPI1->SR & SPI_SR_TXE)){}
-     *((__IO uint8_t *)&SPI1->DR) = cmd;
-	
-	   while ( SPI1->SR & SPI_SR_BSY )
-      {
-            (void)SPI1->DR;
-      }
-     SX1278_hw_SetNSS(1);	
- 
-
-
-
-
-
-
+	//while (GPIOA->IDR & MISO){};							
+	while (!(SPI1->SR & SPI_SR_TXE)){};  
+	SPI1_DR_8bit = (WRITE_SINGLE | command);
+	while (SPI1->SR & SPI_SR_BSY){};
+	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+	temp=SPI1_DR_8bit;
+	while (!(SPI1->SR & SPI_SR_TXE)){};	 
+	SPI1_DR_8bit = value;
+	while (SPI1->SR & SPI_SR_BSY){};
+	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+	temp=SPI1_DR_8bit;	
+	SX1278_hw_SetNSS(1);
+	return temp;	
 }
 /************************************************************
 *************************************************************/
-
-
+uint8_t SX1276_ReadSingle(uint8_t command)
+{
+	uint8_t temp;
+	SX1278_hw_SetNSS(0);
+	//while (GPIOA->IDR & MISO){};							
+	while (!(SPI1->SR & SPI_SR_TXE)){}; 
+	SPI1_DR_8bit = (command | READ_SINGLE);
+	while (SPI1->SR & SPI_SR_BSY){};
+	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+	command = SPI1_DR_8bit;
+	while (!(SPI1->SR & SPI_SR_TXE)){};	 
+	SPI1_DR_8bit = 0x00;
+	while (SPI1->SR & SPI_SR_BSY){};
+	while (!(SPI1->SR & SPI_SR_RXNE)){};
+	temp = SPI1_DR_8bit;
+	SX1278_hw_SetNSS(1);
+	return temp;	
+}
+/************************************************************
+*************************************************************/
+void SX1276_WriteBurst( uint8_t addr, char *buff, uint8_t size )
+{
+  uint8_t j_;
+	SX1278_hw_SetNSS(0);
+	//while (GPIOA->IDR & MISO){};							
+	while (!(SPI1->SR & SPI_SR_TXE)){};	
+	SPI1_DR_8bit = (addr | WRITE_SINGLE);
+	while (SPI1->SR & SPI_SR_BSY){};		
+	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+	SPI1_DR_8bit;	
+	for( j_ = 0; j_ < size; j_ ++ )
+		{
+			while (!(SPI1->SR & SPI_SR_TXE)){};	
+			SPI1_DR_8bit = buff[j_]; 
+			while (SPI1->SR & SPI_SR_BSY){};
+			while (!(SPI1->SR & SPI_SR_RXNE)){};
+			SPI1_DR_8bit;	
+		}
+	SX1278_hw_SetNSS(1);
+}
+/************************************************************
+*************************************************************/
+void SX1276_ReadBurst( uint8_t cmd, char *buff, uint8_t size){
+	uint8_t j_;
+	SX1278_hw_SetNSS(0);
+	//while (GPIOA->IDR & MISO){};							
+	while (!(SPI1->SR & SPI_SR_TXE)){};	SPI1_DR_8bit = (cmd | READ_SINGLE);
+	while (SPI1->SR & SPI_SR_BSY){};
+	while (!(SPI1->SR & SPI_SR_RXNE)){}; SPI1_DR_8bit;	
+	for( j_ = 0; j_ < size; j_ ++ )
+		{
+			while (!(SPI1->SR & SPI_SR_TXE)){};	SPI1_DR_8bit = 0x00; 
+			while (SPI1->SR & SPI_SR_BSY){};
+			while (!(SPI1->SR & SPI_SR_RXNE)){}; buff[j_] = SPI1_DR_8bit;		
+		}
+	SX1278_hw_SetNSS(1);
+}
 
 
 

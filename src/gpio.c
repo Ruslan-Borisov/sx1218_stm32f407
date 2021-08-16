@@ -67,6 +67,21 @@ void GPIO_Init(void)
 	GPIOD->PUPDR &= ~((1<<22)|(1<<23));/*!<00: No pull-up, pull-down>*/
     GPIOD->PUPDR |= (1<<23);/*!<10: pull-down>*/
 	
+		/*PD3   ------> LORA_SET_PIN (OUTPUT)*/ 
+	/*1. Bits 2y:2y+1 MODERy[1:0]: Port D configuration bit [6;7] */	
+	GPIOD->MODER &= ~((1<<6)|(1<<7)) ; /*!<reset>*/
+	GPIOD->MODER |=  (1<<6);	 /*!<01: General purpose output mode>*/
+
+	/*2. Bits 15:0 OTy: Port D configuration bit[3] */	
+	GPIOD->OTYPER &= ~(1<<3);/*!<0: Output push-pull (reset state)>*/	
+
+	/*3. Bits 2y:2y+1 OSPEEDRy[1:0]: Port D configuration bit [6;7]) */	
+	GPIOD->OSPEEDR &= ~((1<<6)|(1<<7)) ; /*!<00: Low speed>*/
+
+	/*4. Bits 2y:2y+1 PUPDRy[1:0]: Port D configuration bit [6;7]) */	
+	GPIOD->PUPDR &= ~((1<<6)|(1<<7));/*!<00: No pull-up, pull-down>*/
+	GPIOD->PUPDR |=(1<<7);/*!<10: Pull-down>*/
+	GPIOD->BSRR |=  GPIO_BSRR_BR3;
 }
 /************************************************************
 *************************************************************/

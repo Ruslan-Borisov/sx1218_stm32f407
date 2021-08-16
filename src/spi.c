@@ -47,7 +47,7 @@ void spi_master_init(void)
 	SPI1->CR2  &= ~ (1<<0);  /*!<1: Rx buffer DMA enabled> */
   
 	/*8. Bit 6 SPE: SPI enable*/
-	SPI1->CR1 |= (1<<6);  /*!<1: Peripheral enabled> */
+   SPI1->CR1 |= (1<<6);  /*!<1: Peripheral enabled> */
 
 	//DMA2_Stream0_SPI_RX_Init();
 	timDelayMs(100);
@@ -102,6 +102,11 @@ void gpio_spi_master_init(void)
 	/*4. Bits 2y:2y+1 OSPEEDRy[1:0]: Port C configuration bits [14;15]*/		
 	GPIOA->OSPEEDR |=(1<<14)|(1<<15); /*!<11: Very high speed>*/
 
+}
+
+void spiSET_RESET(uint8_t vale)
+{
+	SPI1->CR1 = (vale==1)? SPI1->CR1|(1<<6):SPI1->CR1&(~(1<<6));  /*!<1: Peripheral enabled> */
 }
 
 /************************************************************
