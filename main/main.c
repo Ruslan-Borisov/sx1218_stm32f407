@@ -43,12 +43,14 @@ int main(void)
 {
  
 	RCC_Init();
-  UART1_Init();
+   UART1_Init();
 	GPIO_Init();
 	EXTI_Init();
-  TIM6_Init();
-  spi_master_init();	
-
+   TIM6_Init();
+   SX1278_hw_init();
+	spi_master_init();	
+   timDelayMs(3000);
+	
 	 while (1)
 {
 	if(irqFlagUSART1_RX ==1)
