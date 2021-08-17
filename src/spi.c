@@ -90,8 +90,6 @@ void gpio_spi_master_init(void)
 	/*5. PUPDRy[1:0]: Port x configuration bits [12;13]*/		
 	GPIOA->PUPDR &= ~ (1<<12)|(1<<13); /*!<00: No pull-up, pull-down(reset)>*/
 
-
-
 	/* PA7   ------> SPI1_MOSI*/	
 	/*2. Bits 31:0 AFRHy: Altern8ate function selection for port C bit [31;28]*/	
 	GPIOA->AFR[0] &= ~((1<<28)|(1<<29)|(1<<30)|(1<<31)); /*!< reset>*/

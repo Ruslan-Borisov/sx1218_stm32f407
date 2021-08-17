@@ -251,6 +251,22 @@ uint8_t SX1278_RSSI();
 
 void SX1278_clearLoRaIrq(); 
 
+void SX1278_init(LoRaSettings *MyLoRaSettings,
+						uint64_t frequency,
+						uint8_t power,
+						uint8_t LoRa_SF,
+						uint8_t LoRa_BW,
+						uint8_t LoRa_CR,
+						uint8_t LoRa_CRC_sum, 
+						uint8_t packetLength);
+
+int SX1278_transmit(LoRaSettings *MyLoRaSettings, uint8_t *txBuf, uint8_t length, uint32_t timeout);
+
+uint8_t SX1278_available(LoRaSettings *MyLoRaSettings);
+
+int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout);
+
+
 #ifdef __cplusplus
 }
 #endif

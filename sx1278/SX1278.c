@@ -146,6 +146,68 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 /************************************************************
 *************************************************************/
 
+int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout) 
+{
+	uint8_t addr;
+	uint8_t temp;
+	MyLoRaSettings->packetLength = length;
+	SX1278_config(MyLoRaSettings); //setting base parameter
+	SX1278_WriteSingle(REG_LR_PADAC, 0x87);	//Tx for 20dBm
+	SX1278_WriteSingle(LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
+	SX1278_WriteSingle(REG_LR_DIOMAPPING1, 0x41); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
+	SX1278_clearLoRaIrq();
+	SX1278_WriteSingle(LR_RegIrqFlagsMask, 0xF7); //Open TxDone interrupt
+	SX1278_WriteSingle(LR_RegPayloadLength, length); //RegPayloadLength 21byte
+	addr = SX1278_ReadSingle(LR_RegFifoTxBaseAddr); //RegFiFoTxBaseAddr
+	SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RegFifoAddrPtr
+
+	while(1) 
+		{
+		temp = SX1278_ReadSingle(LR_RegPayloadLength);
+		if(temp == length) 
+			{
+				MyLoRaSettings->status = TX;
+				return 1;
+		   }
+
+		if(--timeout == 0) 
+			{
+				SX1278_hw_Reset();
+				SX1278_config(MyLoRaSettings);
+				return 0;
+		  }
+	  }
+}
+
+/************************************************************
+*************************************************************/
+
+int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, uint8_t *txBuffer, uint8_t length, uint32_t timeout) {
+	  SX1278_WriteBurst(0x00, txBuffer, length);
+	  SX1278_WriteSingle(LR_RegOpMode, 0x8b);	//Tx Mode
+	  while (1) 
+		  {
+			if(SX1278_hw_GetDIO0()) //if(Get_NIRQ()) //Packet send over
+				{ 
+					SX1278_ReadSingle(LR_RegIrqFlags);
+					SX1278_clearLoRaIrq(); //Clear irq
+					SX1278_standby(MyLoRaSettings); //Entry Standby mode
+					return 1;
+			   }
+
+			if(--timeout == 0)
+				{
+					SX1278_hw_Reset();
+					SX1278_config(MyLoRaSettings);
+					return 0;
+			   }
+			SX1278_timDelayMs(1);
+	   }
+}
+
+/************************************************************
+*************************************************************/
+
 void SX1278_entryLoRa()
 {
 	SX1278_WriteSingle(LR_RegOpMode, 0x88);
@@ -192,6 +254,71 @@ uint8_t SX1278_RSSI()
 
 /************************************************************
 *************************************************************/
+
+void SX1278_init(LoRaSettings *MyLoRaSettings,
+						uint64_t frequency,
+						uint8_t power,
+						uint8_t LoRa_SF,
+						uint8_t LoRa_BW,
+						uint8_t LoRa_CR,
+						uint8_t LoRa_CRC_sum, 
+						uint8_t packetLength)
+{
+	SX1278_hw_init();
+	MyLoRaSettings->frequency = frequency;
+	MyLoRaSettings->power = power;
+	MyLoRaSettings->LoRa_SF = LoRa_SF;
+	MyLoRaSettings->LoRa_BW = LoRa_BW;
+	MyLoRaSettings->LoRa_CR = LoRa_CR;
+	MyLoRaSettings->LoRa_CRC_sum = LoRa_CRC_sum;
+	MyLoRaSettings->packetLength = packetLength;
+	SX1278_config(MyLoRaSettings);
+}
+
+/************************************************************
+*************************************************************/
+
+int SX1278_transmit(LoRaSettings *MyLoRaSettings, uint8_t *txBuf, uint8_t length, uint32_t timeout)
+{
+	if (SX1278_LoRaEntryTx(MyLoRaSettings, length, timeout))
+		{
+			return SX1278_LoRaTxPacket(MyLoRaSettings, txBuf, length, timeout);
+	   }
+	return 0;
+}
+
+/************************************************************
+*************************************************************/
+
+int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout)
+{
+	return SX1278_LoRaEntryRx(MyLoRaSettings, length, timeout);
+}
+
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_available(LoRaSettings *MyLoRaSettings) 
+{
+	return SX1278_LoRaRxPacket(MyLoRaSettings);
+}
+
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_read(LoRaSettings *MyLoRaSettings, uint8_t *rxBuf, uint8_t length) 
+{
+	if(length != MyLoRaSettings->readBytes)
+		length = MyLoRaSettings->readBytes;
+//	memcpy(rxBuf, module->rxBuffer, length);
+//	rxBuf[length] = '\0';
+//	module->readBytes = 0;
+//	return length;
+}
+
+/************************************************************
+*************************************************************/
+
 
 
 
