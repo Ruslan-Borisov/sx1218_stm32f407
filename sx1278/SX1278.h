@@ -229,6 +229,8 @@ typedef struct LoRaSettings {
 	uint8_t LoRa_CR;
 	uint8_t LoRa_CRC_sum;
 	uint8_t packetLength;
+	uint8_t loRaIrq;
+	uint8_t ocp_Imax;
 	SX1278_Status_t status;
 	uint8_t rxBuffer[SX1278_MAX_PACKET];
 	uint8_t txBuffer[SX1278_MAX_PACKET];
@@ -266,6 +268,9 @@ uint8_t SX1278_available(LoRaSettings *MyLoRaSettings);
 
 int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout);
 
+int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, uint8_t *txBuffer, uint8_t length, uint32_t timeout);
+
+uint8_t SX1278_OCP_Imax(LoRaSettings *MyLoRaSettings, uint8_t i_max);
 
 #ifdef __cplusplus
 }

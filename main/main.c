@@ -44,7 +44,7 @@ uint8_t vale_test;
 /**/
 uint8_t set_test[256];
 /**/
-uint8_t signal_lora_test;
+int signal_lora_test;
 /**/
 uint8_t sizeLen;	
 /**/
@@ -57,9 +57,12 @@ int main(void)
 	GPIO_Init();
 	EXTI_Init();
    TIM6_Init();
+	
    LORA_ADD_SET();
 	timDelayMs(100);
+	
 	SX1278_hw_init();
+	
    spi_master_init();	
    timDelayMs(1000);
 	
@@ -75,12 +78,13 @@ int main(void)
 	  vale_test = USART1_buff_RX[2];
 	  if(rw_test==0)
      {
+		//  signal_lora_test = SX1278_LoRaTxPacket(MyLoRaSettings, USART1_buff_RX, 3, 90000000000);
 	    signal_lora_test = SX1278_ReadSingle(cmd_test); 
 	  }
 		 if(rw_test==1)
      {
-	    
-	    }
+	      SX1278_WriteSingle(cmd_test, vale_test); 
+	  }
 	 irqFlagUSART1_RX = 0;
 	}
 
