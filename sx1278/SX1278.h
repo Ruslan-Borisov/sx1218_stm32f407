@@ -229,11 +229,17 @@ typedef struct LoRaSettings {
 	uint8_t LoRa_CR;
 	uint8_t LoRa_CRC_sum;
 	uint8_t packetLength;
-	uint8_t loRaIrq;
 	uint8_t ocp_Imax;
 	SX1278_Status_t status;
 	uint8_t rxBuffer[SX1278_MAX_PACKET];
 	uint8_t txBuffer[SX1278_MAX_PACKET];
+	uint8_t Irq_DIO_0;
+	uint8_t Irq_DIO_1;
+	uint8_t Irq_DIO_2;
+	uint8_t Irq_DIO_3;
+	uint8_t Irq_DIO_4;
+	uint8_t Irq_DIO_5;
+	uint8_t preambleDetect;
 	uint8_t readBytes;
 } LoRaSettings;
 
@@ -270,7 +276,12 @@ int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeou
 
 int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, uint8_t *txBuffer, uint8_t length, uint32_t timeout);
 
-uint8_t SX1278_OCP_Imax(LoRaSettings *MyLoRaSettings, uint8_t i_max);
+uint8_t SX1278_OCP_Imax(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_irq_Dio_0_3(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_irq_Dio_4_5_PreambleDetect(LoRaSettings *MyLoRaSettings);
+
 
 #ifdef __cplusplus
 }

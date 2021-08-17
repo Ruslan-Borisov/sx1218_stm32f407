@@ -29,7 +29,8 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
    SX1278_entryLoRa();  // включаем регистры lora          
   //SX1278_SPIWrite(module, 0x5904); //?? Change digital regulator form 1.6V to 1.47V: see errata note
 	// расчет частоты
-	uint64_t freq = ((uint64_t) MyLoRaSettings->frequency << 19) / 32000000;
+	
+	 uint64_t freq = ((uint64_t) MyLoRaSettings->frequency << 19) / 32000000;
    uint8_t freq_reg[3];
    freq_reg[0] = (uint8_t) (freq >> 16);
    freq_reg[1] = (uint8_t) (freq >> 8);
@@ -38,7 +39,10 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
    SX1278_WriteSingle(RegSyncWord, 0x34); // слово инхронизации
 	//настройка базовых параметров
    SX1278_WriteSingle(LR_RegPaConfig, SX1278_Power[MyLoRaSettings->power]); //Setting output power parameter
-   SX1278_WriteSingle(LR_RegOcp, 0x0B);		//RegOcp,Close Ocp
+	
+	 uint8_t ocpTrim =  SX1278_OCP_Imax(MyLoRaSettings);
+   SX1278_WriteSingle(LR_RegOcp, ocpTrim);		//RegOcp,Close Ocp
+	
    SX1278_WriteSingle(LR_RegLna, 0x23);		//RegLNA,High & LNA Enable
    
 	if (SX1278_SpreadFactor[MyLoRaSettings->LoRa_SF] == 6) //SFactor=6
@@ -63,10 +67,10 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
 		}
 	SX1278_WriteSingle(LR_RegModemConfig3, 0x04);
 	SX1278_WriteSingle(LR_RegPreambleMsb, 0x00); //RegPreambleMsb
-   SX1278_WriteSingle(LR_RegPreambleLsb, 8); //RegPreambleLsb 8+4=12byte Preamble
+  SX1278_WriteSingle(LR_RegPreambleLsb, 8); //RegPreambleLsb 8+4=12byte Preamble
  	SX1278_WriteSingle(REG_LR_DIOMAPPING2, 0x01); //RegDioMapping2 DIO5=00, DIO4=01
-   MyLoRaSettings->readBytes = 0;
-   SX1278_standby(MyLoRaSettings); //Entry standby mode
+  MyLoRaSettings->readBytes = 0;
+  SX1278_standby(MyLoRaSettings); //Entry standby mode
 }
 
 /************************************************************
@@ -319,20 +323,48 @@ uint8_t SX1278_read(LoRaSettings *MyLoRaSettings, uint8_t *rxBuf, uint8_t length
 /************************************************************
 *************************************************************/
 
-uint8_t SX1278_OCP_Imax(LoRaSettings *MyLoRaSettings, uint8_t i_max) 
+uint8_t SX1278_OCP_Imax(LoRaSettings *MyLoRaSettings) 
 {  
-	if(i_max>0xF0)
+	uint8_t temp;
+	temp = MyLoRaSettings->ocp_Imax;
+	if(temp>0xF0)
 		{
-		 i_max = 0xF0;
+		temp = 0xF0;
 		}
-	return (i_max<=0xf) ? ((i_max+45)/5):((i_max+30)/10);
+	return (temp<=0xf) ? ((temp+45)/5):((temp+30)/10);
   
 }
 
 /************************************************************
 *************************************************************/
 
+/************************************************************
+*************************************************************/
 
+uint8_t SX1278_irq_Dio_0_3(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	temp |= (MyLoRaSettings->Irq_DIO_0<<6)|(MyLoRaSettings->Irq_DIO_1<<4)|
+	        (MyLoRaSettings->Irq_DIO_2<<2)| (MyLoRaSettings->Irq_DIO_3<<0);
+  return temp;
+}
+
+/************************************************************
+*************************************************************/
+
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_irq_Dio_4_5_PreambleDetect(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	temp |= (MyLoRaSettings->Irq_DIO_4<<6)|(MyLoRaSettings->Irq_DIO_5<<4)|
+	        (MyLoRaSettings->Irq_DIO_2<<0);
+  return temp;
+}
+
+/************************************************************
+*************************************************************/
 
 
 
