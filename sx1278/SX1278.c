@@ -16,10 +16,14 @@
 
 /************************************************************
 *************************************************************/
+
 LoRaSettings MyLoRaSettings;
+
 /************************************************************
 *************************************************************/
-void SX1278_config(LoRaSettings *MyLoRaSettings){
+
+void SX1278_config(LoRaSettings *MyLoRaSettings)
+{
    SX1278_sleep(MyLoRaSettings); //установить режим SLEEP
    SX1278_timDelayMs(15); // задержка 15 мс
    SX1278_entryLoRa();  // включаем регистры lora          
@@ -64,15 +68,19 @@ void SX1278_config(LoRaSettings *MyLoRaSettings){
    MyLoRaSettings->readBytes = 0;
    SX1278_standby(MyLoRaSettings); //Entry standby mode
 }
+
 /************************************************************
 *************************************************************/
+
 void SX1278_sleep(LoRaSettings *MyLoRaSettings) 
 {
 	SX1278_WriteSingle(LR_RegOpMode, 0x08);
 	MyLoRaSettings->status = SLEEP;
 }
+
 /************************************************************
 *************************************************************/
+
 int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout)
 {
 	uint8_t addr;
@@ -105,6 +113,7 @@ int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 			SX1278_timDelayMs(1);
 		}
 }
+
 /************************************************************
 *************************************************************/
 
@@ -133,41 +142,54 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 	  }
 	return MyLoRaSettings->readBytes;
 }
+
 /************************************************************
 *************************************************************/
+
 void SX1278_entryLoRa()
 {
 	SX1278_WriteSingle(LR_RegOpMode, 0x88);
 }
+
 /************************************************************
 *************************************************************/
+
 void SX1278_standby(LoRaSettings *MyLoRaSettings) 
 {
 	SX1278_WriteSingle(LR_RegOpMode, 0x09);
 	MyLoRaSettings->status = STANDBY;
 }
+
 /************************************************************
 *************************************************************/
+
 void SX1278_clearLoRaIrq() 
 {
 	SX1278_WriteSingle(LR_RegIrqFlags, 0xFF);
 }
+
 /************************************************************
 *************************************************************/
-uint8_t SX1278_RSSI_LoRa(){
+
+uint8_t SX1278_RSSI_LoRa()
+{
 	uint32_t temp = 10;
 	temp = SX1278_ReadSingle(LR_RegRssiValue); //Read RegRssiValue, Rssi value
 	temp = temp + 127 - 137; //127:Max RSSI, 137:RSSI offset
 	return (uint8_t) temp;
 }
+
 /************************************************************
 *************************************************************/
-uint8_t SX1278_RSSI() {
+
+uint8_t SX1278_RSSI()
+{
 	uint8_t temp = 0xff;
 	temp = SX1278_ReadSingle(RegRssiValue);
 	temp = 127 - (temp >> 1);	//127:Max RSSI
 	return temp;
 }
+
 /************************************************************
 *************************************************************/
 

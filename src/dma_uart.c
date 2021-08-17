@@ -16,6 +16,7 @@
 
 /************************************************************
 *************************************************************/
+
 void DMA2_Stream2_USART_RX_Init(void)
 {
 	/*1. Enable DMA2 clock*/
@@ -70,8 +71,10 @@ void DMA2_Stream2_USART_RX_Init(void)
 	NVIC_EnableIRQ(DMA2_Stream2_IRQn);
 	NVIC_SetPriority(DMA2_Stream2_IRQn,1);
 }
+
 /************************************************************
 *************************************************************/
+
 void DMA2_Stream7_USART_TX_Init(void)
 {
 	/* Enable DMA2 clock*/
@@ -127,9 +130,11 @@ void DMA2_Stream7_USART_TX_Init(void)
 	NVIC_EnableIRQ(DMA2_Stream7_IRQn);
 	NVIC_SetPriority(DMA2_Stream7_IRQn,1);
 }
+
 /************************************************************
 *************************************************************/
 void dmaSendUSART1(uint8_t *data, uint8_t len)
+	
 {
 	static uint8_t buff[5];
 	for(int i=0; i<len; i++)
@@ -141,7 +146,12 @@ void dmaSendUSART1(uint8_t *data, uint8_t len)
 	DMA2_Stream7->NDTR = len; 
 	DMA2_Stream7->CR |=  (1<<0); /*!<enabled> */
 }
+
 /************************************************************
 *************************************************************/
+
+
+
+
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/

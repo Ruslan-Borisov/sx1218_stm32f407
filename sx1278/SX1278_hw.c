@@ -19,37 +19,51 @@
 
 /************************************************************
 *************************************************************/
- void SX1278_hw_init() {
+
+void SX1278_hw_init() 
+{
 	SX1278_hw_SetNSS(1);
 	RST_SET();
 }
 /************************************************************
 *************************************************************/
- void SX1278_hw_SetNSS(int value) {
+
+void SX1278_hw_SetNSS(int value)
+{
 	NSS_GPIO_BSRR  |= ((value == 1) ? NSS_SET: NSS_RESET);
 }
+
 /************************************************************
 *************************************************************/
- void SX1278_hw_Reset() {
+
+void SX1278_hw_Reset() 
+{
 	SX1278_hw_SetNSS(1);
 	RST_RESET();
 	timDelayMs(1);
 	RST_SET();
 	timDelayMs(100);
 }
+
 /************************************************************
 *************************************************************/
-int SX1278_hw_GetDIO0() {
+
+int SX1278_hw_GetDIO0()
+{
 	return (DIO0_GPIO_ODR & DIO0_GPIO_STATUS)==SET ? 1:0;
 }
+
 /************************************************************
 *************************************************************/
+
 void SX1278_timDelayMs(uint32_t msec)
 {
 	timDelayMs(msec);
 }
+
 /************************************************************
 *************************************************************/
+
 uint8_t SX1278_WriteSingle(uint8_t command, uint8_t value) 													
 {
 	uint8_t temp;
@@ -68,8 +82,10 @@ uint8_t SX1278_WriteSingle(uint8_t command, uint8_t value)
 	SX1278_hw_SetNSS(1);
 	return temp;	
 }
+
 /************************************************************
 *************************************************************/
+
 uint8_t SX1278_ReadSingle(uint8_t command)
 {
 	uint8_t temp;
@@ -88,8 +104,10 @@ uint8_t SX1278_ReadSingle(uint8_t command)
 	SX1278_hw_SetNSS(1);
 	return temp;	
 }
+
 /************************************************************
 *************************************************************/
+
 void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 {
   uint8_t j_;
@@ -100,7 +118,7 @@ void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 	while (SPI1->SR & SPI_SR_BSY){};		
 	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
 	SPI1_DR_8bit;	
-	for( j_ = 0; j_ < size; j_ ++ )
+	for(j_ = 0; j_ < size; j_ ++ )
 		{
 			while (!(SPI1->SR & SPI_SR_TXE)){};	
 			SPI1_DR_8bit = buff[j_]; 
@@ -110,9 +128,12 @@ void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 		}
 	SX1278_hw_SetNSS(1);
 }
+
 /************************************************************
 *************************************************************/
-void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size){
+
+void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size)
+{
 	uint8_t j_;
 	SX1278_hw_SetNSS(0);
 	//while (GPIOA->IDR & MISO){};							
@@ -128,7 +149,8 @@ void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size){
 	SX1278_hw_SetNSS(1);
 }
 
-
+/************************************************************
+*************************************************************/
 
 
 
