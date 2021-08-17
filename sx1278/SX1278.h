@@ -190,18 +190,6 @@ static const uint8_t SX1278_SpreadFactor[7] = { 6, 7, 8, 9, 10, 11, 12 };
 #define	SX1278_LORA_BW_250KHZ		8
 #define	SX1278_LORA_BW_500KHZ		9
 
-static const uint8_t SX1278_LoRaBandwidth[10] = { 0, //   7.8KHz,
-		1, //  10.4KHz,
-		2, //  15.6KHz,
-		3, //  20.8KHz,
-		4, //  31.2KHz,
-		5, //  41.7KHz,
-		6, //  62.5KHz,
-		7, // 125.0KHz,
-		8, // 250.0KHz,
-		9  // 500.0KHz
-		};
-
 //Coding rate
 #define SX1278_LORA_CR_4_5    0
 #define SX1278_LORA_CR_4_6    1
@@ -214,7 +202,6 @@ static const uint8_t SX1278_CodingRate[4] = { 0x01, 0x02, 0x03, 0x04 };
 #define SX1278_LORA_CRC_EN              0
 #define SX1278_LORA_CRC_DIS             1
 
-static const uint8_t SX1278_CRC_Sum[2] = { 0x01, 0x00 };
 
 typedef enum _SX1278_STATUS {
 	SLEEP, STANDBY, TX, RX
@@ -223,29 +210,33 @@ typedef enum _SX1278_STATUS {
 
 typedef struct LoRaSettings {
 	uint64_t frequency;
+	
 	uint8_t power;
-	uint8_t LoRa_SF;
-	uint8_t LoRa_BW;
-	uint8_t LoRa_CodingRate;
 	
-	uint8_t LoRa_RxPayloadCrcOn;
-	uint8_t LoRa_header_mode;
-	uint8_t LoRa_packetLength;
+	uint8_t LoRa_SF_1E;
+	uint8_t LoRa_RxPayloadCrcOn_1E;
 	
-	uint8_t LoRa_ocp_Imax;
-	uint8_t LoRa_ocp_SET;
+	uint8_t LoRa_BW_1D;
+	uint8_t LoRa_CodingRate_1D;
 	
-	uint8_t LoRa_SyncWord;
 	
-	uint8_t LoRa_Lna_Gain;
-	uint8_t LoRa_Lna_BoostLf;
-	uint8_t LoRa_Lna_BoostHf;
 	
-	uint8_t LoRa_LDRateOptimize;
-	uint8_t LoRa_AgcAutoOn;
 	
-	uint8_t PreambleMsb;
-	uint8_t PreamblelSB;
+	uint8_t LoRa_ocp_Imax_0B;
+	uint8_t LoRa_ocp_SET_0B;
+	
+	uint8_t LoRa_SyncWord_39;
+	
+	uint8_t LoRa_Lna_Gain_0C;
+	uint8_t LoRa_Lna_BoostLf_0C;
+	uint8_t LoRa_Lna_BoostHf_0C;
+	
+	uint8_t LoRa_LDRateOptimize_26;
+	uint8_t LoRa_AgcAutoOn_26;
+	
+	uint8_t PreambleMsb_20;
+	
+	uint8_t PreamblelSB_21;
 	
 	uint8_t PreambleDetect_41;
 	uint8_t Dio_4_0Map_41;
@@ -256,15 +247,19 @@ typedef struct LoRaSettings {
 	uint8_t Dio_2_0Map_40;
 	uint8_t Dio_3_0Map_40;
 		
-  uint8_t RxTimeoutMask;
-  uint8_t RxDoneMask;
-  uint8_t PayloadCrcErrorMask;
-  uint8_t ValidHeaderMask;
-  uint8_t TxDoneMask;
-  uint8_t CadDoneMask;
-  uint8_t FhssChangeChannelMask;
-  uint8_t CadDetectedMask;
-	uint8_t preambleDetect;
+  uint8_t RxTimeoutMask_11;
+  uint8_t RxDoneMask_11;
+  uint8_t PayloadCrcErrorMask_11;
+  uint8_t ValidHeaderMask_11;
+  uint8_t TxDoneMask_11;
+  uint8_t CadDoneMask_11;
+  uint8_t FhssChangeChannelMask_11;
+  uint8_t CadDetectedMask_11;
+	
+	uint8_t LoRa_header_mode;
+	uint8_t LoRa_packetLength;
+	
+	uint8_t preambleDetect_1F;
 	
 	uint8_t rxBuffer[SX1278_MAX_PACKET];
 	uint8_t txBuffer[SX1278_MAX_PACKET];
@@ -290,14 +285,7 @@ uint8_t SX1278_RSSI();
 
 void SX1278_clearLoRaIrq(); 
 
-void SX1278_init(LoRaSettings *MyLoRaSettings,
-						uint64_t frequency,
-						uint8_t power,
-						uint8_t LoRa_SF,
-						uint8_t LoRa_BW,
-						uint8_t LoRa_CR,
-						uint8_t LoRa_CRC_sum, 
-						uint8_t packetLength);
+void SX1278_init();
 
 int SX1278_transmit(LoRaSettings *MyLoRaSettings, uint8_t *txBuf, uint8_t length, uint32_t timeout);
 
@@ -309,9 +297,7 @@ int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, uint8_t *txBuffer, uint8_t
 
 uint8_t SX1278_LR_RegOcp(LoRaSettings *MyLoRaSettings);
 
-uint8_t SX1278_irq_Dio_0_3(LoRaSettings *MyLoRaSettings);
-
-uint8_t SX1278_irq_Dio_4_5_PreambleDetect(LoRaSettings *MyLoRaSettings);
+uint8_t SX1278_LR_DIOMAPPING1(LoRaSettings *MyLoRaSettings); 
 
 uint8_t SX1278_RegLna(LoRaSettings *MyLoRaSettings);
 
@@ -322,6 +308,8 @@ uint8_t SX1278_LR_RegModemConfig2(LoRaSettings *MyLoRaSettings);
 uint8_t SX1278_LR_RegModemConfig3(LoRaSettings *MyLoRaSettings);
 
 uint8_t SX1278_LR_DIOMAPPING2(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_LR_RegIrqFlagsMask(LoRaSettings *MyLoRaSettings);
 
 #ifdef __cplusplus
 }
