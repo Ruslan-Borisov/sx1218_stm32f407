@@ -75,7 +75,7 @@ int main(void)
 	  vale_test = USART1_buff_RX[2];
 	  if(rw_test==0)
      {
-	    signal_lora_test = SX1276_ReadSingle(cmd_test); 
+	    signal_lora_test = SX1278_ReadSingle(cmd_test); 
 	  }
 		 if(rw_test==1)
      {

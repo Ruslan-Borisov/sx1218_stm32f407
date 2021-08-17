@@ -89,18 +89,20 @@ int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 	SX1278_WriteSingle(LR_RegOpMode, 0x8d);	//Mode//Low Frequency Mode
 	//SX1278_WriteSingle(LR_RegOpMode,0x05);	//Continuous Rx Mode //High Frequency Mode
 	MyLoRaSettings->readBytes = 0;
-	while (1) {
-		if ((SX1278_ReadSingle(LR_RegModemStat) & 0x04) == 0x04) {	//Rx-on going RegModemStat
+	while (1) 
+		{
+			if ((SX1278_ReadSingle(LR_RegModemStat) & 0x04) == 0x04) {	//Rx-on going RegModemStat
 			MyLoRaSettings->status = RX;
 			return 1;
 		}
-		if (--timeout == 0) {
+	if (--timeout == 0) 
+		{
 			SX1278_hw_Reset();
 			SX1278_config(MyLoRaSettings);
 			return 0;
 		}
-		SX1278_timDelayMs(1);
-	}
+SX1278_timDelayMs(1);
+}
 }
 /************************************************************
 *************************************************************/
@@ -108,23 +110,26 @@ int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 	uint8_t addr;
 	uint8_t packet_size;
-	if (SX1278_hw_GetDIO0(module->hw)) {
-		memset(module->rxBuffer, 0x00, SX1278_MAX_PACKET);
-
-		addr = SX1278_SPIRead(module, LR_RegFifoRxCurrentaddr); //last packet addr
-		SX1278_SPIWrite(module, LR_RegFifoAddrPtr, addr); //RxBaseAddr -> FiFoAddrPtr
-
-		if (module->LoRa_SF == SX1278_LORA_SF_6) { //When SpreadFactor is six,will used Implicit Header mode(Excluding internal packet length)
-			packet_size = module->packetLength;
-		} else {
-			packet_size = SX1278_SPIRead(module, LR_RegRxNbBytes); //Number for received bytes
-		}
-
-		SX1278_SPIBurstRead(module, 0x00, module->rxBuffer, packet_size);
-		module->readBytes = packet_size;
-		SX1278_clearLoRaIrq(module);
+	if (SX1278_hw_GetDIO0()){
+		for(int i=0; i<SX1278_MAX_PACKET; i++)
+			{
+				MyLoRaSettings->txBuffer[i] = 0x00;
+			}
+		addr = SX1278_ReadSingle(LR_RegFifoRxCurrentaddr); //last packet addr
+		SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RxBaseAddr -> FiFoAddrPtr
+		if (MyLoRaSettings->LoRa_SF == SX1278_LORA_SF_6) //When SpreadFactor is six,will used Implicit Header mode(Excluding internal packet length)
+			{ 
+				packet_size = MyLoRaSettings->packetLength;
+			} 
+		else 
+			{
+				packet_size = SX1278_ReadSingle(LR_RegRxNbBytes); //Number for received bytes
+			}
+		SX1278_ReadBurst(0x00, MyLoRaSettings->rxBuffer, packet_size);
+		MyLoRaSettings->readBytes = packet_size;
+		SX1278_clearLoRaIrq();
 	}
-	return module->readBytes;
+	return MyLoRaSettings->readBytes;
 }
 /************************************************************
 *************************************************************/

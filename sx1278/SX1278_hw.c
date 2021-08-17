@@ -112,7 +112,7 @@ void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 }
 /************************************************************
 *************************************************************/
-void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size){
+void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size){
 	uint8_t j_;
 	SX1278_hw_SetNSS(0);
 	//while (GPIOA->IDR & MISO){};							
