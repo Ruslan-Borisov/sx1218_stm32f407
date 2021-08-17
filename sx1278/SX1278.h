@@ -243,6 +243,13 @@ void SX1278_sleep(LoRaSettings *MyLoRaSettings);
 
 void SX1278_entryLoRa();
 
+void SX1278_standby(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_RSSI_LoRa();
+
+uint8_t SX1278_RSSI();
+
+void SX1278_clearLoRaIrq(); 
 
 #ifdef __cplusplus
 }

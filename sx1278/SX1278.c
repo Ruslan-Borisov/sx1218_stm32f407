@@ -57,15 +57,15 @@ void SX1278_config(LoRaSettings *MyLoRaSettings){
        	SX1278_WriteSingle(LR_RegModemConfig2,((SX1278_SpreadFactor[MyLoRaSettings->LoRa_SF] << 4)
 									  + (SX1278_CRC_Sum[MyLoRaSettings->LoRa_CRC_sum] << 2) + 0x00)); //SFactor &  LNA gain set by the internal AGC loop
 		}
-	ё(LR_RegModemConfig3, 0x04);
-   SX1278_SPIWrite(MyLoRaSettings, LR_RegSymbTimeoutLsb, 0x08); //RegSymbTimeoutLsb Timeout = 0x3FF(Max)
-//	SX1278_SPIWrite(MyLoRaSettings, LR_RegPreambleMsb, 0x00); //RegPreambleMsb
-//	SX1278_SPIWrite(MyLoRaSettings, LR_RegPreambleLsb, 8); //RegPreambleLsb 8+4=12byte Preamble
-//	SX1278_SPIWrite(MyLoRaSettings, REG_LR_DIOMAPPING2, 0x01); //RegDioMapping2 DIO5=00, DIO4=01
-//	MyLoRaSettings->readBytes = 0;
-//	//SX1278_standby(MyLoRaSettings); //Entry standby mode
+	SX1278_WriteSingle(LR_RegModemConfig3, 0x04);
+	SX1278_WriteSingle(LR_RegPreambleMsb, 0x00); //RegPreambleMsb
+   SX1278_WriteSingle(LR_RegPreambleLsb, 8); //RegPreambleLsb 8+4=12byte Preamble
+ 	SX1278_WriteSingle(REG_LR_DIOMAPPING2, 0x01); //RegDioMapping2 DIO5=00, DIO4=01
+   MyLoRaSettings->readBytes = 0;
+   SX1278_standby(MyLoRaSettings); //Entry standby mode
 }
-
+/************************************************************
+*************************************************************/
 void SX1278_sleep(LoRaSettings *MyLoRaSettings) 
 {
 	SX1278_WriteSingle(LR_RegOpMode, 0x08);
@@ -73,10 +73,99 @@ void SX1278_sleep(LoRaSettings *MyLoRaSettings)
 }
 /************************************************************
 *************************************************************/
+int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout)
+{
+	uint8_t addr;
+	MyLoRaSettings->packetLength = length;
+	SX1278_config(MyLoRaSettings);		//Setting base parameter
+	SX1278_WriteSingle(REG_LR_PADAC, 0x84);	//Normal and RX
+	SX1278_WriteSingle(LR_RegHopPeriod, 0xFF);	//No FHSS
+	SX1278_WriteSingle(REG_LR_DIOMAPPING1, 0x01);//DIO=00,DIO1=00,DIO2=00, DIO3=01
+	SX1278_WriteSingle(LR_RegIrqFlagsMask, 0x3F);//Open RxDone interrupt & Timeout
+	SX1278_clearLoRaIrq();  // очистить флаги прерывания
+	SX1278_WriteSingle(LR_RegPayloadLength, length);//Payload Length 21byte(this register must difine when the data long of one byte in SF is 6)
+	addr = SX1278_ReadSingle(LR_RegFifoRxBaseAddr); //Read RxBaseAddr
+	SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RxBaseAddr->FiFoAddrPtr
+	SX1278_WriteSingle(LR_RegOpMode, 0x8d);	//Mode//Low Frequency Mode
+	//SX1278_WriteSingle(LR_RegOpMode,0x05);	//Continuous Rx Mode //High Frequency Mode
+	MyLoRaSettings->readBytes = 0;
+	while (1) {
+		if ((SX1278_ReadSingle(LR_RegModemStat) & 0x04) == 0x04) {	//Rx-on going RegModemStat
+			MyLoRaSettings->status = RX;
+			return 1;
+		}
+		if (--timeout == 0) {
+			SX1278_hw_Reset();
+			SX1278_config(MyLoRaSettings);
+			return 0;
+		}
+		SX1278_timDelayMs(1);
+	}
+}
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
+	uint8_t addr;
+	uint8_t packet_size;
+	if (SX1278_hw_GetDIO0(module->hw)) {
+		memset(module->rxBuffer, 0x00, SX1278_MAX_PACKET);
+
+		addr = SX1278_SPIRead(module, LR_RegFifoRxCurrentaddr); //last packet addr
+		SX1278_SPIWrite(module, LR_RegFifoAddrPtr, addr); //RxBaseAddr -> FiFoAddrPtr
+
+		if (module->LoRa_SF == SX1278_LORA_SF_6) { //When SpreadFactor is six,will used Implicit Header mode(Excluding internal packet length)
+			packet_size = module->packetLength;
+		} else {
+			packet_size = SX1278_SPIRead(module, LR_RegRxNbBytes); //Number for received bytes
+		}
+
+		SX1278_SPIBurstRead(module, 0x00, module->rxBuffer, packet_size);
+		module->readBytes = packet_size;
+		SX1278_clearLoRaIrq(module);
+	}
+	return module->readBytes;
+}
+/************************************************************
+*************************************************************/
 void SX1278_entryLoRa()
 {
 	SX1278_WriteSingle(LR_RegOpMode, 0x88);
 }
+/************************************************************
+*************************************************************/
+void SX1278_standby(LoRaSettings *MyLoRaSettings) 
+{
+	SX1278_WriteSingle(LR_RegOpMode, 0x09);
+	MyLoRaSettings->status = STANDBY;
+}
+/************************************************************
+*************************************************************/
+void SX1278_clearLoRaIrq() 
+{
+	SX1278_WriteSingle(LR_RegIrqFlags, 0xFF);
+}
+/************************************************************
+*************************************************************/
+uint8_t SX1278_RSSI_LoRa(){
+	uint32_t temp = 10;
+	temp = SX1278_ReadSingle(LR_RegRssiValue); //Read RegRssiValue, Rssi value
+	temp = temp + 127 - 137; //127:Max RSSI, 137:RSSI offset
+	return (uint8_t) temp;
+}
+/************************************************************
+*************************************************************/
+uint8_t SX1278_RSSI() {
+	uint8_t temp = 0xff;
+	temp = SX1278_ReadSingle(RegRssiValue);
+	temp = 127 - (temp >> 1);	//127:Max RSSI
+	return temp;
+}
+/************************************************************
+*************************************************************/
+
+
+
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/
 

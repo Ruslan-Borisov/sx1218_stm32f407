@@ -136,8 +136,6 @@ void dmaSendUSART1(uint8_t *data, uint8_t len)
    {
 	  buff[i] = *data;
 	}
-   
-	
 	//DMA2_Stream7->CR &=~ (1<<0); /*!<Stream disabled> */
    DMA2_Stream7->M0AR = (uint32_t)&buff; /*!< > */
 	DMA2_Stream7->NDTR = len; 
