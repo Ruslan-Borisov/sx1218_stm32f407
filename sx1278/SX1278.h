@@ -241,12 +241,21 @@ typedef struct LoRaSettings {
 	uint8_t LoRa_Lna_BoostLf;
 	uint8_t LoRa_Lna_BoostHf;
 	
-	uint8_t Irq_DIO_0;
-	uint8_t Irq_DIO_1;
-	uint8_t Irq_DIO_2;
-	uint8_t Irq_DIO_3;
-	uint8_t Irq_DIO_4;
-	uint8_t Irq_DIO_5;
+	uint8_t LoRa_LDRateOptimize;
+	uint8_t LoRa_AgcAutoOn;
+	
+	uint8_t PreambleMsb;
+	uint8_t PreamblelSB;
+	
+	uint8_t PreambleDetect_41;
+	uint8_t Dio_4_0Map_41;
+	uint8_t Dio_5_0Map_41;
+	
+	uint8_t Dio_0_0Map_40;
+	uint8_t Dio_1_0Map_40;
+	uint8_t Dio_2_0Map_40;
+	uint8_t Dio_3_0Map_40;
+		
   uint8_t RxTimeoutMask;
   uint8_t RxDoneMask;
   uint8_t PayloadCrcErrorMask;
@@ -309,6 +318,10 @@ uint8_t SX1278_RegLna(LoRaSettings *MyLoRaSettings);
 uint8_t SX1278_LR_RegModemConfig1(LoRaSettings *MyLoRaSettings);
 
 uint8_t SX1278_LR_RegModemConfig2(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_LR_RegModemConfig3(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_LR_DIOMAPPING2(LoRaSettings *MyLoRaSettings);
 
 #ifdef __cplusplus
 }

@@ -24,29 +24,30 @@ LoRaSettings MyLoRaSettings;
 
 void SX1278_config(LoRaSettings *MyLoRaSettings)
 {
-   SX1278_sleep(MyLoRaSettings); //установить режим SLEEP
-   SX1278_timDelayMs(15); // задержка 15 мс
-   SX1278_entryLoRa();  // включаем регистры lora          
+   SX1278_sleep(MyLoRaSettings); 
+   SX1278_timDelayMs(15); 
+   SX1278_entryLoRa();          
   //SX1278_SPIWrite(module, 0x5904); //?? Change digital regulator form 1.6V to 1.47V: see errata note
 	// расчет частоты
 	
 	 uint64_t freq = ((uint64_t) MyLoRaSettings->frequency << 19) / 32000000;
    uint8_t freq_reg[3];
+	
    freq_reg[0] = (uint8_t) (freq >> 16);
    freq_reg[1] = (uint8_t) (freq >> 8);
    freq_reg[2] = (uint8_t) (freq >> 0);
-   SX1278_WriteBurst(LR_RegFrMsb,freq_reg, 3); // настройка частоты 
+   SX1278_WriteBurst(LR_RegFrMsb,freq_reg, 3);  
 	
-   SX1278_WriteSingle(RegSyncWord, MyLoRaSettings->LoRa_SyncWord); // слово инхронизации
-	//настройка базовых параметров
+   SX1278_WriteSingle(RegSyncWord, MyLoRaSettings->LoRa_SyncWord); 
 	
-   SX1278_WriteSingle(LR_RegPaConfig, MyLoRaSettings->power); //Setting output power parameter
+   SX1278_WriteSingle(LR_RegPaConfig, MyLoRaSettings->power); 
 	
-   SX1278_WriteSingle(LR_RegOcp, SX1278_LR_RegOcp(MyLoRaSettings));		//RegOcp,Close Ocp
+   SX1278_WriteSingle(LR_RegOcp, SX1278_LR_RegOcp(MyLoRaSettings));		
 	
-   SX1278_WriteSingle(LR_RegLna, SX1278_RegLna(MyLoRaSettings));		//RegLNA,High & LNA Enable
+   SX1278_WriteSingle(LR_RegLna, SX1278_RegLna(MyLoRaSettings));		
 	 
-	 SX1278_WriteSingle(LR_RegModemConfig1,SX1278_LR_RegModemConfig1(MyLoRaSettings)); 
+	 SX1278_WriteSingle(LR_RegModemConfig1,SX1278_LR_RegModemConfig1(MyLoRaSettings));
+	 
 	 SX1278_WriteSingle(LR_RegModemConfig2,SX1278_LR_RegModemConfig2(MyLoRaSettings)); 
    
 	if (MyLoRaSettings->LoRa_SF== 6) //SFactor=6
@@ -59,12 +60,17 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
          SX1278_WriteSingle(0x37, 0x0C);
 		} 
 		
-	SX1278_WriteSingle(LR_RegModemConfig3, 0x04);
-	SX1278_WriteSingle(LR_RegPreambleMsb, 0x00); //RegPreambleMsb
-  SX1278_WriteSingle(LR_RegPreambleLsb, 8); //RegPreambleLsb 8+4=12byte Preamble
- 	SX1278_WriteSingle(REG_LR_DIOMAPPING2, 0x01); //RegDioMapping2 DIO5=00, DIO4=01
-  MyLoRaSettings->readBytes = 0;
-  SX1278_standby(MyLoRaSettings); //Entry standby mode
+	SX1278_WriteSingle(LR_RegModemConfig3, SX1278_LR_RegModemConfig3(MyLoRaSettings));
+		
+	SX1278_WriteSingle(LR_RegPreambleMsb, MyLoRaSettings->PreambleMsb); //RegPreambleMsb
+		
+  SX1278_WriteSingle(LR_RegPreambleLsb, MyLoRaSettings->PreamblelSB); //RegPreambleLsb 8+4=12byte Preamble
+ 	
+	SX1278_WriteSingle(REG_LR_DIOMAPPING2, 0x01); //RegDioMapping2 DIO5=00, DIO4=01
+  
+	MyLoRaSettings->readBytes = 0;
+  
+	SX1278_standby(MyLoRaSettings); //Entry standby mode
 }
 
 /************************************************************
@@ -386,7 +392,8 @@ uint8_t SX1278_LR_RegModemConfig1(LoRaSettings *MyLoRaSettings)
        return temp;
 		}
 }
-
+/************************************************************
+*************************************************************/
 
 uint8_t SX1278_LR_RegModemConfig2(LoRaSettings *MyLoRaSettings) 
 {  
@@ -401,6 +408,26 @@ uint8_t SX1278_LR_RegModemConfig2(LoRaSettings *MyLoRaSettings)
 			 temp|= (MyLoRaSettings->LoRa_SF << 4)|(MyLoRaSettings->LoRa_RxPayloadCrcOn << 2)|0x00; //SFactor &  LNA gain set by the internal AGC loop
        return temp;
 		}
+}
+
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_LR_RegModemConfig3(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	temp |= (MyLoRaSettings->LoRa_LDRateOptimize << 3)|(MyLoRaSettings-> LoRa_AgcAutoOn <<2);
+  return temp;
+}
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_LR_DIOMAPPING2(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	temp |= (MyLoRaSettings->Dio_4_0Map_41 << 6)|(MyLoRaSettings->Dio_5_0Map_41 << 4)|
+					(MyLoRaSettings->PreambleDetect_41 << 0);
+  return temp;
 }
 
 /************************************************************
