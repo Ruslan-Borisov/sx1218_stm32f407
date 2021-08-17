@@ -36,35 +36,29 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
    freq_reg[1] = (uint8_t) (freq >> 8);
    freq_reg[2] = (uint8_t) (freq >> 0);
    SX1278_WriteBurst(LR_RegFrMsb,freq_reg, 3); // настройка частоты 
-   SX1278_WriteSingle(RegSyncWord, 0x34); // слово инхронизации
+	
+   SX1278_WriteSingle(RegSyncWord, MyLoRaSettings->LoRa_SyncWord); // слово инхронизации
 	//настройка базовых параметров
-   SX1278_WriteSingle(LR_RegPaConfig, SX1278_Power[MyLoRaSettings->power]); //Setting output power parameter
 	
-	 uint8_t ocpTrim =  SX1278_OCP_Imax(MyLoRaSettings);
-   SX1278_WriteSingle(LR_RegOcp, ocpTrim);		//RegOcp,Close Ocp
+   SX1278_WriteSingle(LR_RegPaConfig, MyLoRaSettings->power); //Setting output power parameter
 	
-   SX1278_WriteSingle(LR_RegLna, 0x23);		//RegLNA,High & LNA Enable
+   SX1278_WriteSingle(LR_RegOcp, SX1278_LR_RegOcp(MyLoRaSettings));		//RegOcp,Close Ocp
+	
+   SX1278_WriteSingle(LR_RegLna, SX1278_RegLna(MyLoRaSettings));		//RegLNA,High & LNA Enable
+	 
+	 SX1278_WriteSingle(LR_RegModemConfig1,SX1278_LR_RegModemConfig1(MyLoRaSettings)); 
+	 SX1278_WriteSingle(LR_RegModemConfig2,SX1278_LR_RegModemConfig2(MyLoRaSettings)); 
    
-	if (SX1278_SpreadFactor[MyLoRaSettings->LoRa_SF] == 6) //SFactor=6
+	if (MyLoRaSettings->LoRa_SF== 6) //SFactor=6
 		{	
 			uint8_t tmp;
-         SX1278_WriteSingle(LR_RegModemConfig1,((SX1278_LoRaBandwidth[MyLoRaSettings->LoRa_BW] << 4)
-                            + (SX1278_CodingRate[MyLoRaSettings->LoRa_CR] << 1) + 0x01)); //Implicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
-         SX1278_WriteSingle(LR_RegModemConfig2,((SX1278_SpreadFactor[MyLoRaSettings->LoRa_SF] << 4)
-                            + (SX1278_CRC_Sum[MyLoRaSettings->LoRa_CRC_sum] << 2) + 0x03));
          tmp = SX1278_ReadSingle(0x31);
          tmp &= 0xF8;
          tmp |= 0x05;
          SX1278_WriteSingle(0x31, tmp);
          SX1278_WriteSingle(0x37, 0x0C);
 		} 
-		else
-		{
-			SX1278_WriteSingle(LR_RegModemConfig1,  ((SX1278_LoRaBandwidth[MyLoRaSettings->LoRa_BW] << 4)
- 						           + (SX1278_CodingRate[MyLoRaSettings->LoRa_CR] << 1) + 0x00)); //Explicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
-       	SX1278_WriteSingle(LR_RegModemConfig2,((SX1278_SpreadFactor[MyLoRaSettings->LoRa_SF] << 4)
-									  + (SX1278_CRC_Sum[MyLoRaSettings->LoRa_CRC_sum] << 2) + 0x00)); //SFactor &  LNA gain set by the internal AGC loop
-		}
+		
 	SX1278_WriteSingle(LR_RegModemConfig3, 0x04);
 	SX1278_WriteSingle(LR_RegPreambleMsb, 0x00); //RegPreambleMsb
   SX1278_WriteSingle(LR_RegPreambleLsb, 8); //RegPreambleLsb 8+4=12byte Preamble
@@ -88,7 +82,7 @@ void SX1278_sleep(LoRaSettings *MyLoRaSettings)
 int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout)
 {
 	uint8_t addr;
-	MyLoRaSettings->packetLength = length;
+	MyLoRaSettings->LoRa_packetLength = length;
 	SX1278_config(MyLoRaSettings);		//Setting base parameter
 	SX1278_WriteSingle(REG_LR_PADAC, 0x84);	//Normal and RX
 	SX1278_WriteSingle(LR_RegHopPeriod, 0xFF);	//No FHSS
@@ -134,7 +128,7 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 			SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RxBaseAddr -> FiFoAddrPtr
 			if (MyLoRaSettings->LoRa_SF == SX1278_LORA_SF_6) //When SpreadFactor is six,will used Implicit Header mode(Excluding internal packet length)
 				{ 
-					packet_size = MyLoRaSettings->packetLength;
+					packet_size = MyLoRaSettings->LoRa_packetLength;
 				} 
 			else 
 				{
@@ -154,7 +148,7 @@ int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 {
 	uint8_t addr;
 	uint8_t temp;
-	MyLoRaSettings->packetLength = length;
+	MyLoRaSettings->LoRa_packetLength = length;
 	SX1278_config(MyLoRaSettings); //setting base parameter
 	SX1278_WriteSingle(REG_LR_PADAC, 0x87);	//Tx for 20dBm
 	SX1278_WriteSingle(LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
@@ -268,15 +262,15 @@ void SX1278_init(LoRaSettings *MyLoRaSettings,
 						uint8_t LoRa_CRC_sum, 
 						uint8_t packetLength)
 {
-	SX1278_hw_init();
-	MyLoRaSettings->frequency = frequency;
-	MyLoRaSettings->power = power;
-	MyLoRaSettings->LoRa_SF = LoRa_SF;
-	MyLoRaSettings->LoRa_BW = LoRa_BW;
-	MyLoRaSettings->LoRa_CR = LoRa_CR;
-	MyLoRaSettings->LoRa_CRC_sum = LoRa_CRC_sum;
-	MyLoRaSettings->packetLength = packetLength;
-	SX1278_config(MyLoRaSettings);
+//	SX1278_hw_init();
+//	MyLoRaSettings->frequency = frequency;
+//	MyLoRaSettings->power = power;
+//	MyLoRaSettings->LoRa_SF = LoRa_SF;
+//	MyLoRaSettings->LoRa_BW = LoRa_BW;
+//	MyLoRaSettings->LoRa_CR = LoRa_CR;
+//	MyLoRaSettings->LoRa_CRC_sum = LoRa_CRC_sum;
+//	MyLoRaSettings->packetLength = packetLength;
+//	SX1278_config(MyLoRaSettings);
 }
 
 /************************************************************
@@ -323,10 +317,10 @@ uint8_t SX1278_read(LoRaSettings *MyLoRaSettings, uint8_t *rxBuf, uint8_t length
 /************************************************************
 *************************************************************/
 
-uint8_t SX1278_OCP_Imax(LoRaSettings *MyLoRaSettings) 
+uint8_t SX1278_LR_RegOcp(LoRaSettings *MyLoRaSettings) 
 {  
 	uint8_t temp;
-	temp = MyLoRaSettings->ocp_Imax;
+	temp = MyLoRaSettings->LoRa_ocp_Imax;
 	if(temp>0xF0)
 		{
 		temp = 0xF0;
@@ -367,6 +361,52 @@ uint8_t SX1278_irq_Dio_4_5_PreambleDetect(LoRaSettings *MyLoRaSettings)
 *************************************************************/
 
 
+uint8_t SX1278_RegLna(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	temp |= (MyLoRaSettings->LoRa_Lna_Gain<<5)|(MyLoRaSettings-> LoRa_Lna_BoostLf<<3)|
+	        (MyLoRaSettings->LoRa_Lna_BoostHf<<0);
+  return temp;
+}
+
+/************************************************************
+*************************************************************/
+
+uint8_t SX1278_LR_RegModemConfig1(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	if (MyLoRaSettings->LoRa_SF== 6) 
+		{	
+        temp|= (MyLoRaSettings->LoRa_BW<< 4)|(MyLoRaSettings->LoRa_CodingRate<< 1)|0x01; //Implicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
+        return temp;
+		} 
+		else
+		{
+			 temp|= (MyLoRaSettings->LoRa_BW << 4)|(MyLoRaSettings->LoRa_CodingRate<< 1)|0x00; //Explicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
+       return temp;
+		}
+}
+
+
+uint8_t SX1278_LR_RegModemConfig2(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	if (MyLoRaSettings->LoRa_SF== 6) 
+		{	
+        temp|= (MyLoRaSettings->LoRa_SF << 4)|(MyLoRaSettings->LoRa_RxPayloadCrcOn<< 2)|0x03;
+        return temp;
+		} 
+		else
+		{
+			 temp|= (MyLoRaSettings->LoRa_SF << 4)|(MyLoRaSettings->LoRa_RxPayloadCrcOn << 2)|0x00; //SFactor &  LNA gain set by the internal AGC loop
+       return temp;
+		}
+}
+
+/************************************************************
+*************************************************************/
+/************************************************************
+*************************************************************/
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/
 
