@@ -57,7 +57,7 @@ int main(void)
 	GPIO_Init();
 	EXTI_Init();
    TIM6_Init();
-  LORA_ADD_SET();
+   LORA_ADD_SET();
 	timDelayMs(100);
 	SX1278_hw_init();
    spi_master_init();	

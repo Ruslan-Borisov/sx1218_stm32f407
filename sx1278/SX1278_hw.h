@@ -18,9 +18,9 @@ extern "C" {
 
 #include "main.h"
 
-#define SPI_STATE_READY  (1<<15)
+#define SPI_STATE_READY             (1<<15)
 
-#define SPI1_DR_8bit 			*((__IO uint8_t *)&SPI1->DR)
+#define SPI1_DR_8bit 			      *((__IO uint8_t *)&SPI1->DR)
 
 
 #define 	WRITE_SINGLE     				0x80
@@ -69,12 +69,15 @@ int SX1278_hw_GetDIO0();
 
 int SPI_GetState();
 
-uint8_t SX1276_WriteSingle(uint8_t command, uint8_t value);
+uint8_t SX1278_WriteSingle(uint8_t command, uint8_t value);
 
-uint8_t SX1276_ReadSingle(uint8_t command);
+uint8_t SX1278_ReadSingle(uint8_t command);
 
+void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size);
 
+void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size);
 
+void SX1278_timDelayMs(uint32_t msec);
 
 #ifdef __cplusplus
 }
