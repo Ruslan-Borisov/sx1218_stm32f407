@@ -33,6 +33,7 @@ extern volatile uint8_t irqFlagUSART1_TX;
 extern volatile uint8_t irqFlagUSART1_RX;
 /**/
 extern volatile uint8_t irqFlagEXTI_DIO0;
+extern volatile uint8_t irqFlagEXTI_DIO1;
 /**/
 extern volatile uint8_t irqFlagSPI_RX;
 /**/
@@ -40,6 +41,15 @@ extern uint8_t sizeLen;
 /**/
 extern  uint8_t testcounter;
 /**/
+extern uint8_t test_loraset;
+
+
+
+//extern LoRaSettings MyLoRaSettings;
+
+
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -133,16 +133,12 @@ void DMA2_Stream7_USART_TX_Init(void)
 
 /************************************************************
 *************************************************************/
-void dmaSendUSART1(uint8_t *data, uint8_t len)
+void dmaSendUSART1(char *data, uint8_t len)
 	
 {
-	static uint8_t buff[5];
-	for(int i=0; i<len; i++)
-   {
-	  buff[i] = *data;
-	}
+	
 	//DMA2_Stream7->CR &=~ (1<<0); /*!<Stream disabled> */
-   DMA2_Stream7->M0AR = (uint32_t)&buff; /*!< > */
+   DMA2_Stream7->M0AR = (uint32_t)&data; /*!< > */
 	DMA2_Stream7->NDTR = len; 
 	DMA2_Stream7->CR |=  (1<<0); /*!<enabled> */
 }

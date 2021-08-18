@@ -30,9 +30,11 @@ extern volatile uint8_t status_DIO_0;
 extern volatile uint8_t irqFlagUSART1_TX;
 extern volatile uint8_t irqFlagUSART1_RX;
 /**/	 
-extern volatile uint8_t irqFlagEXTI_DIO0;
+extern volatile uint8_t irqFlagEXTI_DIO0;	 
 /**/
-extern volatile uint8_t irqFlagSPI_RX;	  
+extern volatile uint8_t irqFlagEXTI_DIO1;
+/**/
+extern volatile uint8_t irqFlagSPI_RX;		 
 /**/
 void DMA2_Stream0_IRQHandler(void);
 /**/	 

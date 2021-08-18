@@ -120,11 +120,13 @@ void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 	SPI1_DR_8bit;	
 	for(j_ = 0; j_ < size; j_ ++ )
 		{
+			SX1278_hw_SetNSS(0);//добавленно
 			while (!(SPI1->SR & SPI_SR_TXE)){};	
 			SPI1_DR_8bit = buff[j_]; 
 			while (SPI1->SR & SPI_SR_BSY){};
 			while (!(SPI1->SR & SPI_SR_RXNE)){};
 			SPI1_DR_8bit;	
+			SX1278_hw_SetNSS(1);//добавленно
 		}
 	SX1278_hw_SetNSS(1);
 }

@@ -35,7 +35,7 @@ void DMA2_Stream2_USART_RX_Init(void);
 	
 void DMA2_Stream2_USART_TX_Init(void);
 	
-void dmaSendUSART1(uint8_t *data, uint8_t len);
+void dmaSendUSART1(char *data, uint8_t len);
 
 extern uint8_t sizeLen;	
 
