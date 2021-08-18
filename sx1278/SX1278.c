@@ -29,9 +29,9 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
    SX1278_entryLoRa();          
   //SX1278_SPIWrite(module, 0x5904); //?? Change digital regulator form 1.6V to 1.47V: see errata note
 	
-	 uint64_t freq = ((uint64_t) MyLoRaSettings->frequency << 19) / 32000000;
+	uint32_t freq = ((uint32_t) MyLoRaSettings->frequency *534288) / 32;
    uint8_t freq_reg[3];
-	
+
    freq_reg[0] = (uint8_t) (freq >> 16);
    freq_reg[1] = (uint8_t) (freq >> 8);
    freq_reg[2] = (uint8_t) (freq >> 0);
@@ -39,7 +39,7 @@ void SX1278_config(LoRaSettings *MyLoRaSettings)
 	
    SX1278_WriteSingle(RegSyncWord, MyLoRaSettings->LoRa_SyncWord_39); 
 	
-   SX1278_WriteSingle(LR_RegPaConfig, MyLoRaSettings->power); 
+   SX1278_WriteSingle(LR_RegPaConfig, SX1278_LR_RegPaConfig(MyLoRaSettings)); 
 	
    SX1278_WriteSingle(LR_RegOcp, SX1278_LR_RegOcp(MyLoRaSettings));		
 	
@@ -405,6 +405,15 @@ uint8_t SX1278_LR_RegIrqFlagsMask(LoRaSettings *MyLoRaSettings)
 					(MyLoRaSettings->PayloadCrcErrorMask_11 << 5)|(MyLoRaSettings->ValidHeaderMask_11 << 4)|
 					(MyLoRaSettings->TxDoneMask_11 << 3)|(MyLoRaSettings->CadDoneMask_11 << 2)|
 					(MyLoRaSettings->FhssChangeChannelMask_11 << 1)|(MyLoRaSettings->CadDetectedMask_11 << 0);
+  return temp;
+}
+/************************************************************
+*************************************************************/
+uint8_t SX1278_LR_RegPaConfig(LoRaSettings *MyLoRaSettings) 
+{  
+	uint8_t temp;
+	temp |= (MyLoRaSettings->PaSelect_09 << 7)|(MyLoRaSettings->MaxPower_09 <<4)|
+					(MyLoRaSettings-> OutputPower_09 << 0);
   return temp;
 }
 /************************************************************

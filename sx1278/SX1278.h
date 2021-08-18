@@ -211,7 +211,10 @@ typedef enum _SX1278_STATUS {
 typedef struct LoRaSettings {
 	uint64_t frequency;
 	
-	uint8_t power;
+
+	uint8_t PaSelect_09;
+	uint8_t MaxPower_09;
+	uint8_t OutputPower_09;
 	
 	uint8_t LoRa_SF_1E;
 	uint8_t LoRa_RxPayloadCrcOn_1E;
@@ -310,6 +313,8 @@ uint8_t SX1278_LR_RegModemConfig3(LoRaSettings *MyLoRaSettings);
 uint8_t SX1278_LR_DIOMAPPING2(LoRaSettings *MyLoRaSettings);
 
 uint8_t SX1278_LR_RegIrqFlagsMask(LoRaSettings *MyLoRaSettings);
+
+uint8_t SX1278_LR_RegPaConfig(LoRaSettings *MyLoRaSettings);
 
 #ifdef __cplusplus
 }
