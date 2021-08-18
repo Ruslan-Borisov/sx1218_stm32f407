@@ -38,39 +38,60 @@ volatile uint8_t irqFlagSPI_RX;
 /**/
 volatile uint8_t irqFlagEXTI_DIO0;
 /**/
-
-void init_struct_MyLoRaSettings(LoRaSettings *MyLoRaSettings)
-{
-	
-}
-
+uint8_t rw_test;
+uint8_t cmd_test;
+uint8_t vale_test;
+/**/
+uint8_t set_test[256];
+/**/
+int signal_lora_test;
+/**/
+uint8_t sizeLen;	
+/**/
 
 int main(void)
 {
  
 	RCC_Init();
-  UART1_Init();
+   UART1_Init();
 	GPIO_Init();
 	EXTI_Init();
-  TIM6_Init();
+   TIM6_Init();
 	
-  LORA_ADD_SET();
+   LORA_ADD_SET();
 	timDelayMs(100);
 	
 	SX1278_hw_init();
 	
-  spi_master_init();	
-  timDelayMs(1000);
+   spi_master_init();	
+   timDelayMs(1000);
 	
 	
 	 while (1)
 {
 
+	if(irqFlagUSART1_RX==1)
+  {
+	  
+	  rw_test = USART1_buff_RX[0];
+	  cmd_test = USART1_buff_RX[1];
+	  vale_test = USART1_buff_RX[2];
+	  if(rw_test==0)
+     {
+		//  signal_lora_test = SX1278_LoRaTxPacket(MyLoRaSettings, USART1_buff_RX, 3, 90000000000);
+	    signal_lora_test = SX1278_ReadSingle(cmd_test); 
+	  }
+		 if(rw_test==1)
+     {
+	      SX1278_WriteSingle(cmd_test, vale_test); 
+	  }
+	 irqFlagUSART1_RX = 0;
+	}
 
 }
  
 }
-
+	
 
 
 
