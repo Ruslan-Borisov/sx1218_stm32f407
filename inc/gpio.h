@@ -38,8 +38,6 @@ extern "C" {
 
 
 void GPIO_Init(void);
-void EXTI_Init(void);
-
 
 
 #ifdef __cplusplus

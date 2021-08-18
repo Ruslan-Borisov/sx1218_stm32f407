@@ -67,8 +67,10 @@ void USART1_IRQHandler(void)
 /*External Interrupt Handler (PD11)*/
 void EXTI15_10_IRQHandler(void)
 {
+	 
+	 irqFlagEXTI_DIO0 = 1;
+	 testcounter++;
 	 EXTI->PR = (1<<11);
-	irqFlagEXTI_DIO0 = 1;
 }
 
 /************************************************************

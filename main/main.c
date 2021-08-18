@@ -20,7 +20,7 @@
 #include "SX1278_hw.h"
 #include "SX1278.h"
 #include "dma _spi.h"
-
+#include "exti.h"
 
 //#define _SLEVE
 
@@ -47,6 +47,9 @@ uint8_t set_test[256];
 int signal_lora_test;
 /**/
 uint8_t sizeLen;	
+/**/
+/**/
+uint8_t testcounter;	
 /**/
 
 int main(void)
