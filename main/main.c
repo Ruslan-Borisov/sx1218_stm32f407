@@ -129,7 +129,7 @@ int main(void)
 	 
 //++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++	
 //#ifdef TX 	 
-         timDelayMs(1000);
+         timDelayMs(4000);
 	     
 	      if(irqFlagEXTI_DIO0 == 1){
 		   bufTX[2] = (char)testcounter;
