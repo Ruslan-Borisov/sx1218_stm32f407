@@ -73,7 +73,7 @@ LoRaSettings settings;
 char text_RX[] = "DATA_INPUT";
 /**/
 char bufTX[] = {"ST"};
-char bufRX[3];
+char bufRX[5];
 
 int main(void)
 {
@@ -114,7 +114,7 @@ int main(void)
 		 SX1278_standby(&settings);
 		 irqFlagEXTI_DIO0=2;
 		 SX1278_LoRaRxPacket(&settings);  
-       SX1278_LoRaEntryRx(&settings, 3, 3000);
+       SX1278_LoRaEntryRx(&settings, 5, 3000);
 	 }
 
 	if(irqFlagUSART1_RX==1)
@@ -201,7 +201,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 1;    // не явный режим заголовка
+	settings->ImplicitHeaderModeOn_1D = 1;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
@@ -260,7 +260,7 @@ void init_LoRaSettings(LoRaSettings *settings){
   
 	settings->LoRa_header_mode = 0;
 	
-	settings->LoRa_packetLength = 3;  //длина пакета
+	settings->LoRa_packetLength = 5;  //длина пакета
 	
 	settings->preambleDetect_1F = 0;
 	
