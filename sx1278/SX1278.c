@@ -160,11 +160,12 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 
 int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout) 
 {
+	SX1278_standby(MyLoRaSettings);
 	uint8_t addr;
 	uint8_t temp;
 	MyLoRaSettings->LoRa_packetLength = length;
 	SX1278_config(MyLoRaSettings); //setting base parameter
-	SX1278_WriteSingle(REG_LR_PADAC, 0x87);	//Tx for 20dBm
+	//SX1278_WriteSingle(REG_LR_PADAC, 0x87);	//Tx for 20dBm
 	SX1278_WriteSingle(LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
 	SX1278_LR_DIOMAPPING1_SET(MyLoRaSettings, 0x01, 0x00);
 	SX1278_WriteSingle(REG_LR_DIOMAPPING1, SX1278_LR_DIOMAPPING1(MyLoRaSettings)); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
