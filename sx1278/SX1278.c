@@ -363,12 +363,12 @@ uint8_t SX1278_LR_RegModemConfig1(LoRaSettings *MyLoRaSettings)
 	uint8_t temp;
 	if (MyLoRaSettings->LoRa_SF_1E== 6) 
 		{	
-        temp = (MyLoRaSettings->LoRa_BW_1D<< 4)+(MyLoRaSettings->LoRa_CodingRate_1D<< 1)+0x01; //Implicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
+        temp = (MyLoRaSettings->LoRa_BW_1D<< 4)+(MyLoRaSettings->LoRa_CodingRate_1D<< 1)+(MyLoRaSettings->ImplicitHeaderModeOn_1D); //Implicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
         return temp;
 		} 
 		else
 		{
-			 temp = (MyLoRaSettings->LoRa_BW_1D << 4)+(MyLoRaSettings->LoRa_CodingRate_1D<< 1)+0x00; //Explicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
+			 temp = (MyLoRaSettings->LoRa_BW_1D << 4)+(MyLoRaSettings->LoRa_CodingRate_1D<< 1)+(MyLoRaSettings->ImplicitHeaderModeOn_1D); //Explicit Enable CRC Enable(0x02) & Error Coding rate 4/5(0x01), 4/6(0x02), 4/7(0x03), 4/8(0x04)
        return temp;
 		}
 }
