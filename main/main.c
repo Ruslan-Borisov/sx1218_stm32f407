@@ -72,8 +72,8 @@ LoRaSettings settings;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-char bufTX[] = {"ST"};
-char bufRX[3];
+char bufTX[5] = {"ST"};
+char bufRX[5];
 
 int main(void)
 {
@@ -106,7 +106,7 @@ int main(void)
 
  //++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++	  
 //#ifdef TX 
-    SX1278_transmit(&settings,bufTX, 3, 1000); // ПЕРЕДАТЧИК
+    SX1278_transmit(&settings,bufTX, 5, 1000); // ПЕРЕДАТЧИК
 //#endif
 //++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++		
 
@@ -132,10 +132,10 @@ int main(void)
          timDelayMs(4000);
 	     
 	      if(irqFlagEXTI_DIO0 == 1){
-		   bufTX[2] = (char)testcounter;
+		   bufTX[4] = (char)testcounter;
 			SX1278_clearLoRaIrq();
 			irqFlagEXTI_DIO0=0;
-         SX1278_transmit(&settings,bufTX, 3, 1000);
+         SX1278_transmit(&settings,bufTX, 5, 1000);
 		}
 //#endif
 //+++++++++++++++++ПЕРЕДАТЧИК++++++++++++++++++
@@ -225,7 +225,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 0x01;             // не явный ти заголовка
+	settings->ImplicitHeaderModeOn_1D = 0x00;             // 1 - не явный ти заголовка 0 - явный заголовок
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
@@ -297,7 +297,7 @@ void init_LoRaSettings(LoRaSettings *settings){
   
 	settings->LoRa_header_mode = 0;
 	
-	settings->LoRa_packetLength = 3;  //длина пакета
+	settings->LoRa_packetLength = 5;  //длина пакета
 	
 	settings->preambleDetect_1F = 0;
 	
