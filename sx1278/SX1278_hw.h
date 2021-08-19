@@ -73,9 +73,9 @@ uint8_t SX1278_WriteSingle(uint8_t command, uint8_t value);
 
 uint8_t SX1278_ReadSingle(uint8_t command);
 
-void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size);
+void SX1278_WriteBurst( uint8_t addr,char *buff, uint8_t size);
 
-void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size);
+void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size);
 
 void SX1278_timDelayMs(uint32_t msec);
 

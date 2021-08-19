@@ -35,7 +35,7 @@ void DMA2_Stream7_IRQHandler(void)
 	if(DMA2->HISR & (1<<5) )
 	{	
 		DMA2->HIFCR |= (1<<5);	
-      irqFlagUSART1_TX = 1;		
+      irqFlagUSART1_TX = 0;		
 	}
 }
 
@@ -80,7 +80,6 @@ void EXTI15_10_IRQHandler(void)
 void EXTI0_IRQHandler(void)
 { 
 	 irqFlagEXTI_DIO1 = 1;
-	 testcounter++;
 	 EXTI->PR = (1<<0);
 }
 

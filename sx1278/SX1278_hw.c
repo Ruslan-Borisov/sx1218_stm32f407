@@ -108,7 +108,7 @@ uint8_t SX1278_ReadSingle(uint8_t command)
 /************************************************************
 *************************************************************/
 
-void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
+void SX1278_WriteBurst( uint8_t addr,char *buff, uint8_t size)
 {
   uint8_t j_;
 	SX1278_hw_SetNSS(0);
@@ -120,21 +120,41 @@ void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 	SPI1_DR_8bit;	
 	for(j_ = 0; j_ < size; j_ ++ )
 		{
-			SX1278_hw_SetNSS(0);//добавленно
 			while (!(SPI1->SR & SPI_SR_TXE)){};	
 			SPI1_DR_8bit = buff[j_]; 
 			while (SPI1->SR & SPI_SR_BSY){};
 			while (!(SPI1->SR & SPI_SR_RXNE)){};
 			SPI1_DR_8bit;	
-			SX1278_hw_SetNSS(1);//добавленно
 		}
 	SX1278_hw_SetNSS(1);
 }
 
 /************************************************************
 *************************************************************/
+//void SX1278_WriteBurst( uint8_t addr,char *buff, uint8_t size)
+//{  
+//	uint8_t temp;
+//	for(int i=0; i<size; i++){
+//	SX1278_hw_SetNSS(0);
+//	//while (GPIOA->IDR & MISO){};							
+//	while (!(SPI1->SR & SPI_SR_TXE)){};  
+//	SPI1_DR_8bit = (WRITE_SINGLE | (addr+i));
+//	while (SPI1->SR & SPI_SR_BSY){};
+//	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+//	temp=SPI1_DR_8bit;
+//	while (!(SPI1->SR & SPI_SR_TXE)){};	 
+//	SPI1_DR_8bit = buff[i];
+//	while (SPI1->SR & SPI_SR_BSY){};
+//	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+//	temp=SPI1_DR_8bit;	
+//	SX1278_hw_SetNSS(1);
+//	timDelayMs(1);
+//	}
+//}
 
-void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size)
+/************************************************************
+*************************************************************/
+void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size)
 {
 	uint8_t j_;
 	SX1278_hw_SetNSS(0);
@@ -153,7 +173,29 @@ void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size)
 
 /************************************************************
 *************************************************************/
+//void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size)
+//{
+//uint8_t temp;
+//	for(int i=0; i<size; i++){
+//	SX1278_hw_SetNSS(0);
+//	//while (GPIOA->IDR & MISO){};							
+//	while (!(SPI1->SR & SPI_SR_TXE)){}; 
+//	SPI1_DR_8bit = ((cmd+i)| READ_SINGLE);
+//	while (SPI1->SR & SPI_SR_BSY){};
+//	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
+//	temp = SPI1_DR_8bit;
+//	while (!(SPI1->SR & SPI_SR_TXE)){};	 
+//	SPI1_DR_8bit = 0x00;
+//	while (SPI1->SR & SPI_SR_BSY){};
+//	while (!(SPI1->SR & SPI_SR_RXNE)){};
+//	buff[i] = SPI1_DR_8bit;
+//	SX1278_hw_SetNSS(1);
+//	timDelayMs(1);
+//	}		
+//}
 
+/************************************************************
+*************************************************************/
 
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/

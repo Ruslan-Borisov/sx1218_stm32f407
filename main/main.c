@@ -22,9 +22,21 @@
 #include "dma _spi.h"
 #include "exti.h"
 
-//#define _SLEVE
-void Lora_transmit(uint8_t *buff, uint8_t len);
-void Lora_receive(uint8_t *buff, uint8_t len);
+
+
+
+
+ char tx[] = {"msg_tx"};
+ char rx[] = {"msg_rx"};
+
+
+
+
+
+
+void Lora_transmit(char *buff, uint8_t len);
+
+void Lora_receive(char *buff, uint8_t len);
 /**/
 void init_LoRaSettings(LoRaSettings *settings);
 
@@ -60,8 +72,8 @@ LoRaSettings settings;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-uint8_t bufTX[] = {211, 220, 100};
-uint8_t bufRX[6];
+char bufTX[] = {"ST"};
+char bufRX[3];
 
 int main(void)
 {
@@ -80,14 +92,55 @@ int main(void)
    spi_master_init();	
    timDelayMs(1000);
 	
+	 
+	 init_LoRaSettings(&settings);
+	 SX1278_config(&settings);
+    SX1278_clearLoRaIrq();
+    irqFlagEXTI_DIO0=0;
 	
-	init_LoRaSettings(&settings);
-	SX1278_config(&settings);
+//----------------ПРИЕМНИК-------------------
+//#ifdef RX    
+	 SX1278_LoRaEntryRx(&settings, 3, 3000);  // ПРИЕМНИК 
+//#endif	 
+//----------------ПРИЕМНИК-------------------	 
 
-	
+// //++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++	  
+//#ifdef TX 
+//    SX1278_transmit(&settings,bufTX, 3, 1000); // ПЕРЕДАТЧИК
+//#endif
+////++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++		
+
+
 	 while (1)
  {
-
+    
+//----------------ПРИЕМНИК-------------------
+//#ifdef RX 
+	 if(irqFlagEXTI_DIO0 == 1){
+		
+		 SX1278_standby(&settings);
+		 irqFlagEXTI_DIO0=2;
+		 SX1278_LoRaRxPacket(&settings);  
+       SX1278_LoRaEntryRx(&settings, 3, 3000);
+	 }
+//#endif
+//----------------ПРИЕМНИК-------------------
+	 
+	 
+//++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++	
+//#ifdef TX 	 
+//         timDelayMs(1000);
+//	     
+//	      if(irqFlagEXTI_DIO0 == 1){
+//		   bufTX[2] = (char)testcounter;
+//			SX1278_clearLoRaIrq();
+//			irqFlagEXTI_DIO0=0;
+//         SX1278_transmit(&settings,bufTX, 3, 1000);
+//		}
+//#endif
+//+++++++++++++++++ПЕРЕДАТЧИК++++++++++++++++++
+	 
+ 
 	if(irqFlagUSART1_RX==1)
 		{
 			rw_test = USART1_buff_RX[0];
@@ -112,28 +165,25 @@ int main(void)
 				}
 			if(rw_test==3)
 				{
-					Lora_receive(bufRX, 6);
+					Lora_receive(bufRX, 12);
 					 
 				}
 		  irqFlagUSART1_RX = 0;	
 		}
-	if(irqFlagEXTI_DIO0==1)
 
-	{
-		irqFlagEXTI_DIO0 = 0;
-	}
 
   }
 }
 
-void Lora_transmit(uint8_t *buff, uint8_t len)
+void Lora_transmit(char *buff, uint8_t len)
 {
   SX1278_WriteBurst(LR_RegFifo, buff, len);
 
 }
 
-void Lora_receive(uint8_t *buff, uint8_t len)
+void Lora_receive(char *buff, uint8_t len)
 {
+  //SX1278_WriteSingle(0x0D, 0); 
   SX1278_ReadBurst(LR_RegFifo, buff, len);
 
 }
@@ -214,17 +264,36 @@ void init_LoRaSettings(LoRaSettings *settings){
 	settings-> Dio_1_0Map_40 = 0;               /*00 - RxTimeout, 01 - FhssChangeChannel, 10 - CadDetected */
 	settings-> Dio_2_0Map_40 = 0;
 	settings-> Dio_3_0Map_40 = 0;               /*00 - FhssChangeChannel, 01 - FhssChangeChannel, 10 - FhssChangeChannel */
-	
-	/*RegIrqFlagsMask (0x11)*/	
-   settings->RxTimeoutMask_11 = 0;
+
+
+//----------------ПРИЕМНИК-------------------	
+//#ifdef RX 	
+	settings->RxTimeoutMask_11 = 1;
    settings->RxDoneMask_11 = 0;
    settings->PayloadCrcErrorMask_11 = 1;
    settings->ValidHeaderMask_11 = 1;
-   settings-> TxDoneMask_11 = 0;
+   settings-> TxDoneMask_11 = 1;
    settings->CadDoneMask_11=1;
    settings->FhssChangeChannelMask_11 = 1;
    settings->CadDetectedMask_11 = 1;
+//#endif	
+//----------------ПРИЕМНИК-------------------
 	
+//++++++++++++++++ ПЕРЕДАТЧИК+++++++++++++++++		 
+//#ifdef TX  
+//	settings->RxTimeoutMask_11 = 1;
+//   settings->RxDoneMask_11 = 1;
+//   settings->PayloadCrcErrorMask_11 = 1;
+//   settings->ValidHeaderMask_11 = 1;
+//   settings-> TxDoneMask_11 = 0;
+//   settings->CadDoneMask_11=1;
+//   settings->FhssChangeChannelMask_11 = 1;
+//   settings->CadDetectedMask_11 = 1;
+//#endif	
+//+++++++++++++++++ПЕРЕДАТЧИК++++++++++++++++++
+
+	/*RegIrqFlagsMask (0x11)*/	
+  
 	settings->LoRa_header_mode = 0;
 	
 	settings->LoRa_packetLength = 3;  //длина пакета

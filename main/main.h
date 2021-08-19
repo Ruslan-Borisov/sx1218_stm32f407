@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+#define SLEVE	
+	
+	
 #include "stm32f4xx.h"
 /* */
 #define SIZE_BUFF_SPI1_RX     3
