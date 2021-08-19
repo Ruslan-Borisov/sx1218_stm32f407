@@ -222,6 +222,8 @@ typedef struct LoRaSettings {
 	
 	uint8_t LoRa_BW_1D;
 	uint8_t LoRa_CodingRate_1D;
+	uint8_t ImplicitHeaderModeOn_1D;
+	
 	
 	uint8_t LoRa_ocp_Imax_0B;
 	uint8_t LoRa_ocp_SET_0B;
