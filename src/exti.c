@@ -100,7 +100,7 @@ void EXTI_Init(void)
 	
 	/*5. Bits 15:0 EXTIx[3:0]: EXTI x configuration (x = 8 to 11) bit [0:3] */	
 	SYSCFG->EXTICR[0] &= ~((1<<0)|(1<<1)|(1<<2)|(1<<3)) ; /*!<reset>*/
-	SYSCFG->EXTICR[0] |= (1<<0)|(1<<1) ; /*!<0011: PD[x] pin>*/
+	//SYSCFG->EXTICR[0] |= (1<<0)|(1<<1) ; /*!<0011: PD[x] pin>*/
 	
 	NVIC_EnableIRQ(EXTI0_IRQn);
 	NVIC_SetPriority(EXTI0_IRQn ,1);

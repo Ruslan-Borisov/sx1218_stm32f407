@@ -72,8 +72,8 @@ LoRaSettings settings;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-char bufTX[5] = {"ST"};
-char bufRX[5];
+char bufTX[4] = {"ST"};
+char bufRX[20];
 
 int main(void)
 {
@@ -132,10 +132,11 @@ int main(void)
          timDelayMs(4000);
 	     
 	      if(irqFlagEXTI_DIO0 == 1){
-		   bufTX[4] = (char)testcounter;
+		   bufTX[3] = testcounter;
 			SX1278_clearLoRaIrq();
 			irqFlagEXTI_DIO0=0;
          SX1278_transmit(&settings,bufTX, 5, 1000);
+			//SX1278_ReadBurst( 0x00, bufRX, 20);
 		}
 //#endif
 //+++++++++++++++++ПЕРЕДАТЧИК++++++++++++++++++

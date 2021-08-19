@@ -158,7 +158,7 @@ void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size)
 {
 	uint8_t j_;
 	SX1278_hw_SetNSS(0);
-	//while (GPIOA->IDR & MISO){};							
+	while (GPIOA->IDR & MISO){};							
 	while (!(SPI1->SR & SPI_SR_TXE)){};	SPI1_DR_8bit = (cmd | READ_SINGLE);
 	while (SPI1->SR & SPI_SR_BSY){};
 	while (!(SPI1->SR & SPI_SR_RXNE)){}; SPI1_DR_8bit;	
