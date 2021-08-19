@@ -139,8 +139,8 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 				{
 					MyLoRaSettings->rxBuffer[i] = 0x00;
 				}
-			addr = SX1278_ReadSingle(LR_RegFifoRxCurrentaddr); //last packet addr
-			SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RxBaseAddr -> FiFoAddrPtr
+			//addr = SX1278_ReadSingle(LR_RegFifoRxCurrentaddr); //last packet addr
+			SX1278_WriteSingle(LR_RegFifoAddrPtr, 0x00); //RxBaseAddr -> FiFoAddrPtr
 			if (MyLoRaSettings->LoRa_SF_1E == SX1278_LORA_SF_6) //When SpreadFactor is six,will used Implicit Header mode(Excluding internal packet length)
 				{ 
 					packet_size = MyLoRaSettings->LoRa_packetLength;
@@ -172,7 +172,7 @@ int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 	SX1278_WriteSingle(LR_RegIrqFlagsMask, 0xF7); //Open TxDone interrupt
 	SX1278_WriteSingle(LR_RegPayloadLength, length); //RegPayloadLength 21byte
 	addr = SX1278_ReadSingle(LR_RegFifoTxBaseAddr); //RegFiFoTxBaseAddr
-	SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RegFifoAddrPtr
+	SX1278_WriteSingle(LR_RegFifoAddrPtr, 0x00); //RegFifoAddrPtr
 
 //	while(1) 
 //		{
