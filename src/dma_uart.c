@@ -136,12 +136,10 @@ void DMA2_Stream7_USART_TX_Init(void)
 void dmaSendUSART1(char *data)
 	
 {
-	while(irqFlagSPI_RX ==0){}
 	//DMA2_Stream7->CR &=~ (1<<0); /*!<Stream disabled> */
    DMA2_Stream7->M0AR = (uint32_t)data; /*!< > */
 	DMA2_Stream7->NDTR = 6; 
 	DMA2_Stream7->CR |=  (1<<0); /*!<enabled> */
-   irqFlagSPI_RX =1;
 }
 
 /************************************************************

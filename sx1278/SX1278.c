@@ -172,8 +172,8 @@ int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 	SX1278_clearLoRaIrq();
 	SX1278_WriteSingle(LR_RegIrqFlagsMask, 0xF7); //Open TxDone interrupt
 	SX1278_WriteSingle(LR_RegPayloadLength, length); //RegPayloadLength 21byte
-	addr = SX1278_ReadSingle(LR_RegFifoTxBaseAddr); //RegFiFoTxBaseAddr
-	SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RegFifoAddrPtr
+	//addr = SX1278_ReadSingle(LR_RegFifoTxBaseAddr); //RegFiFoTxBaseAddr
+	SX1278_WriteSingle(LR_RegFifoAddrPtr, 0x00); //RegFifoAddrPtr
 
 //	while(1) 
 //		{
