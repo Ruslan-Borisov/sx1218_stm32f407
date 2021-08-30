@@ -173,25 +173,12 @@ void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size)
 
 /************************************************************
 *************************************************************/
-void SX1278_Correct( uint8_t cmd, char *buff, uint8_t size)
+void SX1278_Correct( uint8_t cmd, uint8_t signal)
 {
-uint8_t temp;
-	for(int i=0; i<size; i++){
-	SX1278_hw_SetNSS(0);
-	//while (GPIOA->IDR & MISO){};							
-	while (!(SPI1->SR & SPI_SR_TXE)){}; 
-	SPI1_DR_8bit = ((cmd+i)| READ_SINGLE);
-	while (SPI1->SR & SPI_SR_BSY){};
-	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
-	temp = SPI1_DR_8bit;
-	while (!(SPI1->SR & SPI_SR_TXE)){};	 
-	SPI1_DR_8bit = 0x00;
-	while (SPI1->SR & SPI_SR_BSY){};
-	while (!(SPI1->SR & SPI_SR_RXNE)){};
-	buff[i] = SPI1_DR_8bit;
-	SX1278_hw_SetNSS(1);
-	timDelayMs(1);
-	}		
+   uint8_t currentSignal = 0;
+	uint8_t correctedSignal = 0;
+	currentSignal = SX1278_ReadSingle(cmd);
+	correctedSignal = currentSignal|signal;
 }
 
 /************************************************************
