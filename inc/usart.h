@@ -1,11 +1,12 @@
 /**
   ******************************************************************************
-  * @file    usart.h
+  * @file    @file    usart.h
   * @brief   This file contains all the function prototypes for
   *          the usart.c file
   ******************************************************************************
   * @attention
  
+  *
   ******************************************************************************
   */
 
@@ -18,6 +19,7 @@ extern "C" {
 
 #include "main.h"
 
+
 /**
   * @brief  Initializes the USART1 and GPIO RX(PA10), TX(PA9).
   * @param  None
@@ -26,11 +28,12 @@ extern "C" {
 void UART1_Init(void);
 extern void DMA2_Stream2_USART_RX_Init(void);
 extern void DMA2_Stream7_USART_TX_Init(void);
-	
+
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __USART_H__ */
+#endif /* __USART_H */
 
-/************************ (C) BORISOV RUSLAN  *****END OF FILE****/
+/************************ (C) BORISOV RUSLAN *****END OF FILE****/

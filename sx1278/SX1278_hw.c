@@ -175,7 +175,7 @@ void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size)
 *************************************************************/
 void SX1278_Correct( uint8_t cmd, uint8_t signal)
 {
-   uint8_t currentSignal = 0;
+  uint8_t currentSignal = 0;
 	uint8_t correctedSignal = 0;
 	currentSignal = SX1278_ReadSingle(cmd);
 	correctedSignal = currentSignal|signal;

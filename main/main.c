@@ -10,8 +10,8 @@
 
 #include <stdint.h>
 #include "main.h"
-#include "dma_uart.h"
 #include "usart.h"
+#include "dma_uart.h"
 #include "stm32f4xx_it.h"
 #include "rcc.h"
 #include "spi.h"
@@ -79,7 +79,7 @@ int main(void)
 {
  
 	RCC_Init();
-   UART1_Init();
+  UART1_Init();
 	GPIO_Init();
 	EXTI_Init();
    TIM6_Init();

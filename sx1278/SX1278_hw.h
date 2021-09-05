@@ -79,6 +79,8 @@ void SX1278_ReadBurst( uint8_t cmd, char *buff, uint8_t size);
 
 void SX1278_timDelayMs(uint32_t msec);
 
+void SX1278_Correct( uint8_t cmd, uint8_t signal);
+
 #ifdef __cplusplus
 }
 #endif
