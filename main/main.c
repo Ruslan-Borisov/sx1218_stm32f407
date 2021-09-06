@@ -25,7 +25,8 @@
 #include "ic1306.h"
 
 
-
+#define _SLAVE	
+#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
@@ -84,7 +85,6 @@ int main(void)
 	RCC_Init();
   UART1_Init();
 	i2c_oled_init();
-	
 	GPIO_Init();
 	EXTI_Init();
   TIM6_Init();
@@ -92,7 +92,8 @@ int main(void)
 	ssd1306_init();
 	LCD_Clear();
 	LCD_Goto(0,0);
-	OLED_string("Lora sx1278");
+	OLED_string("Lora sx1278 ");
+	OLED_num_to_str(1522, 5);
 	LCD_Goto(0,1);
 	OLED_string("String");
 	LCD_Goto(0,2);
@@ -100,33 +101,35 @@ int main(void)
 	
 	
    LORA_ADD_SET();
-	timDelayMs(100);
-	
-	SX1278_hw_init();
-	
+	 timDelayMs(100);
+	 SX1278_hw_init();
    spi_master_init();	
    timDelayMs(1000);
 	
 	 
 	 init_LoRaSettings(&settings);
 	 SX1278_config(&settings);
-    SX1278_clearLoRaIrq();
-    irqFlagEXTI_DIO0=0;
+   SX1278_clearLoRaIrq();
+   irqFlagEXTI_DIO0=0;
 	
-  
-	 SX1278_LoRaEntryRx(&settings, 3, 3000);  // ПРИЕМНИК 
-	 
+	
+	
+#ifdef _SLAVE
+	 SX1278_LoRaEntryRx(&settings, 5, 3000);  // ПРИЕМНИК 
+#endif
+
+#ifdef _MASTER
+	 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК
+#endif
 
 	
 
 
 	 while (1)
  {
-    
-  LCD_Goto(52,5);
-	OLED_num_to_str(gg++,5);
-	timDelayMs(1000);
 	 
+#ifdef _SLAVE   
+/*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
 		
 		 SX1278_standby(&settings);
@@ -134,7 +137,24 @@ int main(void)
 		 SX1278_LoRaRxPacket(&settings);  
      SX1278_LoRaEntryRx(&settings, 5, 3000);
 	 }
-
+/*******************************************************/	 
+#endif
+	 
+/*******************************************************/
+	 
+#ifdef _MASTER   
+/*******************************************************/ 	 
+	 if(irqFlagEXTI_DIO0 == 1){
+		
+		 SX1278_standby(&settings);
+		 irqFlagEXTI_DIO0=2;
+		 SX1278_LoRaRxPacket(&settings);  
+     SX1278_LoRaEntryRx(&settings, 5, 3000);
+	 }
+/*******************************************************/	 
+#endif
+	 
+/*******************************************************/
 	if(irqFlagUSART1_RX==1)
 		{
 			rw_test = USART1_buff_RX[0];
@@ -164,7 +184,7 @@ int main(void)
 				}
 		  irqFlagUSART1_RX = 0;	
 		}
-
+/*******************************************************/
 
   }
 }
@@ -188,7 +208,7 @@ void Lora_receive(char *buff, uint8_t len)
 void init_LoRaSettings(LoRaSettings *settings){
 	
 	/*RegFrMsb(0x06), RegFrMid(0x07), RegFrLsb(0x08)*/
-	settings->frequency = 434;           /*Частота задается в МГц*/
+	settings->frequency = 433;           /*Частота задается в МГц*/
 	
    /*RegPaConfig(0x09)*/
 	settings->PaSelect_09    = 0x00;         /*Выбирает выходной вывод PA - Пин-код RFO. Выходная мощность ограничена +14 дБм.
@@ -207,7 +227,7 @@ void init_LoRaSettings(LoRaSettings *settings){
                                               1 - непрерывный режим, отправка нескольких пакетов через FIFO
                                              (используется для спектрального анализа)*/
 	
-	settings->LoRa_RxPayloadCrcOn_1E = 0 ; /*Включение генерации CRC и проверка полезной нагрузки:
+	settings->LoRa_RxPayloadCrcOn_1E = 0 ;   /*Включение генерации CRC и проверка полезной нагрузки:
                                                  0 - Отключение CRC, 1 - Включить CRC
                                                  Если требуется CRC, следует установить RxPayloadCrcOn:
                                                 - в режиме неявного заголовка: на стороне Tx и Rx
@@ -219,7 +239,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 1;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
+	settings->ImplicitHeaderModeOn_1D = 0;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/

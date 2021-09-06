@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#define SLEVE	
+
 	
 	
 #include "stm32f4xx.h"

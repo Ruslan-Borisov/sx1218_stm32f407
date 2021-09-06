@@ -10,7 +10,18 @@
 
 #include "func.h"
 
+void loraTX_test()
+{
 
 
+
+}
+
+void UART_comman_test()
+{
+
+
+
+}
 
 /************************ (C) BORISOV RUSLAN *****END OF FILE****/
