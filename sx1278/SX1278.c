@@ -139,7 +139,7 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 				{
 					MyLoRaSettings->rxBuffer[i] = 0x00;
 				}
-			//addr = SX1278_ReadSingle(LR_RegFifoRxCurrentaddr); //last packet addr
+			addr = SX1278_ReadSingle(LR_RegFifoRxCurrentaddr); //last packet addr
 			SX1278_WriteSingle(LR_RegFifoAddrPtr, 0x00); //RxBaseAddr -> FiFoAddrPtr
 			if (MyLoRaSettings->LoRa_SF_1E == SX1278_LORA_SF_6) //When SpreadFactor is six,will used Implicit Header mode(Excluding internal packet length)
 				{ 
