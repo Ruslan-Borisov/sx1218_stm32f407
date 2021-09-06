@@ -68,6 +68,28 @@ void GPIO_Init(void)
 	GPIOD->PUPDR &= ~((1<<6)|(1<<7));/*!<00: No pull-up, pull-down>*/
 	GPIOD->PUPDR |=(1<<7);/*!<10: Pull-down>*/
 	GPIOD->BSRR |=  GPIO_BSRR_BR3;
+	
+	
+	/* Enable  GPIOD clock*/
+	RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
+
+	/*SET_OLED GPIO Configuration*/  
+
+	/*PC11   ------> SET_OLED_PIN (INPUT)*/ 
+	/*1. Bits 2y:2y+1 MODERy[1:0]: Port C configuration bit [22;23] */	
+	GPIOC->MODER &= ~((1<<22)|(1<<23)) ; /*!<00: Input (reset state)>*/
+
+	/*2. Bits 15:0 OTy: Port C configuration bit[11] */	
+	GPIOC->OTYPER |= (1<<11);/*!<1: Output open-drain>*/	
+  
+	/*3. Bits 2y:2y+1 OSPEEDRy[1:0]: Port C configuration bit [22;23]) */	
+	GPIOC->OSPEEDR &= ~((1<<22)|(1<<23)) ; /*!<00: Low speed>*/
+
+	/*4. Bits 2y:2y+1 PUPDRy[1:0]: Port C configuration bit [22;23]) */	
+	GPIOC->PUPDR &= ~((1<<22)|(1<<23));/*!<00: No pull-up, pull-down>*/
+  GPIOC->PUPDR |= (1<<23);/*!<10: pull-down>*/
+	 
+
 }
 /************************************************************
 *************************************************************/

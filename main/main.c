@@ -21,7 +21,8 @@
 #include "SX1278.h"
 #include "dma _spi.h"
 #include "exti.h"
-
+#include "i2c_oled.h"
+#include "ic1306.h"
 
 
 
@@ -75,14 +76,28 @@ char text_RX[] = "DATA_INPUT";
 char bufTX[] = {"ST"};
 char bufRX[5];
 
+uint16_t gg;
+
 int main(void)
 {
  
 	RCC_Init();
   UART1_Init();
+	i2c_oled_init();
+	
 	GPIO_Init();
 	EXTI_Init();
-   TIM6_Init();
+  TIM6_Init();
+
+	ssd1306_init();
+	LCD_Clear();
+	LCD_Goto(0,0);
+	OLED_string("Lora sx1278");
+	LCD_Goto(0,1);
+	OLED_string("String");
+	LCD_Goto(0,2);
+	OLED_string("out");
+	
 	
    LORA_ADD_SET();
 	timDelayMs(100);
@@ -108,13 +123,16 @@ int main(void)
 	 while (1)
  {
     
-
+  LCD_Goto(52,5);
+	OLED_num_to_str(gg++,5);
+	timDelayMs(1000);
+	 
 	 if(irqFlagEXTI_DIO0 == 1){
 		
 		 SX1278_standby(&settings);
 		 irqFlagEXTI_DIO0=2;
 		 SX1278_LoRaRxPacket(&settings);  
-       SX1278_LoRaEntryRx(&settings, 5, 3000);
+     SX1278_LoRaEntryRx(&settings, 5, 3000);
 	 }
 
 	if(irqFlagUSART1_RX==1)

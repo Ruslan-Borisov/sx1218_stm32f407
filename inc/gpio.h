@@ -23,6 +23,9 @@ extern "C" {
 #define RST_SET()         (GPIOD->BSRR |=  GPIO_BSRR_BS10)
 #define RST_RESET()       (GPIOD->BSRR |=  GPIO_BSRR_BR10)
 
+#define OLED_SET()         (GPIOC->BSRR |=  GPIO_BSRR_BS11)
+#define OLED_RESET()       (GPIOC->BSRR |=  GPIO_BSRR_BR11)
+
 #define NSS_SET           GPIO_BSRR_BS12
 #define NSS_RESET         GPIO_BSRR_BR12  
 
