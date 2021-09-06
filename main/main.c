@@ -25,7 +25,8 @@
 #include "ic1306.h"
 
 
-#define _SLAVE	
+//#define _SLAVE	
+#define _OLED	
 #define _MASTER
 
  char tx[] = {"msg_tx"};
@@ -131,11 +132,13 @@ int main(void)
 #ifdef _SLAVE   
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
-		
+		 test_loraset++;
+		 OLED_string("Lora RECEIVE = ");
+		 OLED_num_to_str(test_loraset, 5);
 		 SX1278_standby(&settings);
-		 irqFlagEXTI_DIO0=2;
 		 SX1278_LoRaRxPacket(&settings);  
      SX1278_LoRaEntryRx(&settings, 5, 3000);
+		 irqFlagEXTI_DIO0=0;
 	 }
 /*******************************************************/	 
 #endif
@@ -145,11 +148,13 @@ int main(void)
 #ifdef _MASTER   
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
-		
-		 SX1278_standby(&settings);
-		 irqFlagEXTI_DIO0=2;
-		 SX1278_LoRaRxPacket(&settings);  
-     SX1278_LoRaEntryRx(&settings, 5, 3000);
+		 test_loraset++;
+		 LCD_Goto(0,1);
+	   OLED_string("Lora TRANSMIT = ");
+		 OLED_num_to_str(test_loraset, 5);
+		 timDelayMs(1000);
+		 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК  
+	   irqFlagEXTI_DIO0=0;
 	 }
 /*******************************************************/	 
 #endif
@@ -279,10 +284,16 @@ void init_LoRaSettings(LoRaSettings *settings){
 	settings-> Dio_1_0Map_40 = 0;               /*00 - RxTimeout, 01 - FhssChangeChannel, 10 - CadDetected */
 	settings-> Dio_2_0Map_40 = 0;
 	settings-> Dio_3_0Map_40 = 0;               /*00 - FhssChangeChannel, 01 - FhssChangeChannel, 10 - FhssChangeChannel */
+#ifdef _SLAVE
+	 settings->Dio_0_0Map_40 = 0; // ПРИЕМНИК 
+#endif
 
+#ifdef _MASTER
+	 settings->Dio_0_0Map_40 = 0x1; // ПЕРЕДАТЧИК
+#endif
 
 	
-	settings->RxTimeoutMask_11 = 1;
+	 settings->RxTimeoutMask_11 = 1;
    settings->RxDoneMask_11 = 0;
    settings->PayloadCrcErrorMask_11 = 1;
    settings->ValidHeaderMask_11 = 1;
