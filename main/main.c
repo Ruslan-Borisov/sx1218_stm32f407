@@ -70,8 +70,8 @@ LoRaSettings settings;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-char bufTX[5] = {5, 10, 15, 0, 0};
-char bufRX[5];
+uint8_t bufTX[5] = {5, 10, 15, 0, 0};
+uint8_t bufRX[5];
 
 uint16_t gg;
 
@@ -113,7 +113,7 @@ int main(void)
 #ifdef _MASTER
       LCD_Goto(0,0);
 		OLED_string("MASTER");
-	 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК
+	   SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК
 #endif
 
 	
@@ -144,11 +144,11 @@ int main(void)
 	  OLED_string("RSSI = ");
 	  OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
 	  LCD_Goto(0,2);
-	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[0]), 5); //LR_RegFifoAddrPtr
+	  OLED_num_to_str( settings.rxBuffer[0], 5); //LR_RegFifoAddrPtr
 	  OLED_string(" ");
-	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[1]), 5); //LR_RegFifoAddrPtr
+	  OLED_num_to_str( settings.rxBuffer[1], 5); //LR_RegFifoAddrPtr
 	  OLED_string(" ");
-	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[2]), 5); //LR_RegFifoAddrPtr
+	  OLED_num_to_str( settings.rxBuffer[2], 5); //LR_RegFifoAddrPtr
 	    LCD_Goto(0,4);
 	    OLED_string("FIFOadrr = ");
 	    OLED_num_to_str( SX1278_ReadSingle(0x39), 5);
@@ -161,12 +161,13 @@ int main(void)
 #ifdef _MASTER   
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
-		 irqFlagEXTI_DIO0=0;
-		 SX1278_ReadSingle(LR_RegIrqFlags);
-   	 SX1278_clearLoRaIrq(); //Clear irq
+		 
 		 SX1278_standby(&settings); 
-		 SX1278_WriteSingle(LR_RegPayloadLength, 0x00);
+		 irqFlagEXTI_DIO0=0; 
 		 test_loraset++;
+		 LCD_Goto(0,0);
+		 OLED_string("Lora RECEIVE = ");
+		 OLED_num_to_str(test_loraset, 5);
 		 timDelayMs(1000);
 		 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК  
 	  
@@ -175,14 +176,9 @@ int main(void)
 	  OLED_string("RSSI = ");
 	  OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
 	  LCD_Goto(0,2);
-	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[0]), 5); //LR_RegFifoAddrPtr
-	  OLED_string(" ");
-	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[1]), 5); //LR_RegFifoAddrPtr
-	  OLED_string(" ");
-	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[2]), 5); //LR_RegFifoAddrPtr
-	    LCD_Goto(0,4);
-	    OLED_string("FIFOadrr = ");
-	    OLED_num_to_str( SX1278_ReadSingle(0x39), 5);
+	  OLED_string("loadLength = ");
+	  OLED_num_to_str( SX1278_ReadSingle(LR_RegPayloadLength), 5);
+	 
 /*******************************************************/	 
 #endif
 	 
@@ -243,7 +239,7 @@ void Lora_receive( uint8_t *buff, uint8_t len)
 void init_LoRaSettings(LoRaSettings *settings){
 	
 	/*RegFrMsb(0x06), RegFrMid(0x07), RegFrLsb(0x08)*/
-	settings->frequency = 434;           /*Частота задается в МГц*/
+	settings->frequency = 433;           /*Частота задается в МГц*/
 	
    /*RegPaConfig(0x09)*/
 	settings->PaSelect_09    = 0x00;         /*Выбирает выходной вывод PA - Пин-код RFO. Выходная мощность ограничена +14 дБм.
@@ -262,12 +258,19 @@ void init_LoRaSettings(LoRaSettings *settings){
                                               1 - непрерывный режим, отправка нескольких пакетов через FIFO
                                              (используется для спектрального анализа)*/
 	
-	settings->LoRa_RxPayloadCrcOn_1E = 0 ;   /*Включение генерации CRC и проверка полезной нагрузки:
+	#ifdef _SLAVE
+	 settings->LoRa_RxPayloadCrcOn_1E = 0 ; // ПРИЕМНИК 
+#endif
+
+#ifdef _MASTER
+	 settings->LoRa_RxPayloadCrcOn_1E = 0 ;
+#endif
+	/* settings->LoRa_RxPayloadCrcOn_1E = 0 ;   Включение генерации CRC и проверка полезной нагрузки:
                                                  0 - Отключение CRC, 1 - Включить CRC
                                                  Если требуется CRC, следует установить RxPayloadCrcOn:
                                                 - в режиме неявного заголовка: на стороне Tx и Rx
                                                 - в явном режиме заголовка: только на стороне Tx (восстановлено из
-                                                 заголовка на стороне Rx)*/
+                                               заголовка на стороне Rx)*/
 	
 	/*RegModemConfig1(0x1D)*/
 	settings->LoRa_BW_1D = 0x07;             /*Полоса пропускания сигнала*/
