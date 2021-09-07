@@ -23,7 +23,7 @@
 #include "exti.h"
 
 
-
+#define MASTER
 
 
  char tx[] = {"msg_tx"};
@@ -107,15 +107,28 @@ int main(void)
 
 	 while (1)
  {
-    
+/*========MASTER=====================*/	    
+#ifdef MASTER
 
-	 if(irqFlagEXTI_DIO0 == 1){
-		
+	
+
+
+	 
+#endif 
+/*========END OF MASYER=====================*/	 
+#ifndef SLAVE
+	 
+     if(irqFlagEXTI_DIO0 == 1)
+	 {
 		 SX1278_standby(&settings);
 		 irqFlagEXTI_DIO0=2;
 		 SX1278_LoRaRxPacket(&settings);  
        SX1278_LoRaEntryRx(&settings, 5, 3000);
 	 }
+	 
+#endif
+/*========END OF SLAVE =================*/	
+	 
 
 	if(irqFlagUSART1_RX==1)
 		{
@@ -151,18 +164,7 @@ int main(void)
   }
 }
 
-void Lora_transmit(char *buff, uint8_t len)
-{
-  SX1278_WriteBurst(LR_RegFifo, buff, len);
 
-}
-
-void Lora_receive(char *buff, uint8_t len)
-{
-  //SX1278_WriteSingle(0x0D, 0); 
-  SX1278_ReadBurst(LR_RegFifo, buff, len);
-
-}
 
 
 
