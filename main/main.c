@@ -25,21 +25,15 @@
 #include "ic1306.h"
 
 
-//#define _SLAVE	
-#define _OLED	
-#define _MASTER
+#define _SLAVE	
+
+//#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
 
 
 
-
-
-
-void Lora_transmit(char *buff, uint8_t len);
-
-void Lora_receive(char *buff, uint8_t len);
 /**/
 void init_LoRaSettings(LoRaSettings *settings);
 
@@ -83,35 +77,34 @@ uint16_t gg;
 int main(void)
 {
  
-	RCC_Init();
-  UART1_Init();
-	i2c_oled_init();
-	GPIO_Init();
-	EXTI_Init();
-  TIM6_Init();
+		RCC_Init();
+		UART1_Init();
+		
+		GPIO_Init();
+		EXTI_Init();
+		TIM6_Init();
+   #ifdef _SLAVE
+	 i2c_oled_init();
+		ssd1306_init();
+		LCD_Clear();
+		LCD_Goto(0,0);
+		OLED_string("Lora sx1278 ");
+   #endif
+	
+	
 
-	ssd1306_init();
-	LCD_Clear();
-	LCD_Goto(0,0);
-	OLED_string("Lora sx1278 ");
-	OLED_num_to_str(1522, 5);
-	LCD_Goto(0,1);
-	OLED_string("String");
-	LCD_Goto(0,2);
-	OLED_string("out");
+
+		LORA_ADD_SET();
+		timDelayMs(100);
+		SX1278_hw_init();
+		spi_master_init();	
+		timDelayMs(1000);
 	
-	
-   LORA_ADD_SET();
-	 timDelayMs(100);
-	 SX1278_hw_init();
-   spi_master_init();	
-   timDelayMs(1000);
-	
-	 
-	 init_LoRaSettings(&settings);
-	 SX1278_config(&settings);
-   SX1278_clearLoRaIrq();
-   irqFlagEXTI_DIO0=0;
+
+		init_LoRaSettings(&settings);
+		SX1278_config(&settings);
+		SX1278_clearLoRaIrq();
+		irqFlagEXTI_DIO0=0;
 	
 	
 	
@@ -133,11 +126,13 @@ int main(void)
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
 		 test_loraset++;
+		 LCD_Goto(0,1);
 		 OLED_string("Lora RECEIVE = ");
 		 OLED_num_to_str(test_loraset, 5);
+		 LCD_Goto(0,2);
 		 SX1278_standby(&settings);
 		 SX1278_LoRaRxPacket(&settings);  
-     SX1278_LoRaEntryRx(&settings, 5, 3000);
+       SX1278_LoRaEntryRx(&settings, 5, 3000);
 		 irqFlagEXTI_DIO0=0;
 	 }
 /*******************************************************/	 
@@ -148,10 +143,10 @@ int main(void)
 #ifdef _MASTER   
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
+		 SX1278_ReadSingle(LR_RegIrqFlags);
+   	 SX1278_clearLoRaIrq(); //Clear irq
+		 SX1278_standby(&settings); 
 		 test_loraset++;
-		 LCD_Goto(0,1);
-	   OLED_string("Lora TRANSMIT = ");
-		 OLED_num_to_str(test_loraset, 5);
 		 timDelayMs(1000);
 		 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК  
 	   irqFlagEXTI_DIO0=0;
@@ -194,20 +189,6 @@ int main(void)
   }
 }
 
-void Lora_transmit(char *buff, uint8_t len)
-{
-  SX1278_WriteBurst(LR_RegFifo, buff, len);
-
-}
-
-void Lora_receive(char *buff, uint8_t len)
-{
-  //SX1278_WriteSingle(0x0D, 0); 
-  SX1278_ReadBurst(LR_RegFifo, buff, len);
-
-}
-
-
 
 
 void init_LoRaSettings(LoRaSettings *settings){
@@ -244,7 +225,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 0;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
+	settings->ImplicitHeaderModeOn_1D = 1;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
@@ -284,20 +265,26 @@ void init_LoRaSettings(LoRaSettings *settings){
 	settings-> Dio_1_0Map_40 = 0;               /*00 - RxTimeout, 01 - FhssChangeChannel, 10 - CadDetected */
 	settings-> Dio_2_0Map_40 = 0;
 	settings-> Dio_3_0Map_40 = 0;               /*00 - FhssChangeChannel, 01 - FhssChangeChannel, 10 - FhssChangeChannel */
+
 #ifdef _SLAVE
 	 settings->Dio_0_0Map_40 = 0; // ПРИЕМНИК 
 #endif
 
 #ifdef _MASTER
-	 settings->Dio_0_0Map_40 = 0x1; // ПЕРЕДАТЧИК
+	 settings->Dio_0_0Map_40 = 0x01; // ПЕРЕДАТЧИК
 #endif
 
+#ifdef _SLAVE
+	 settings->RxDoneMask_11 = 0; // ПРИЕМНИК 
+#endif
+
+#ifdef _MASTER
+	 settings-> TxDoneMask_11 = 0;; // ПЕРЕДАТЧИК
+#endif
 	
-	 settings->RxTimeoutMask_11 = 1;
-   settings->RxDoneMask_11 = 0;
+	settings->RxTimeoutMask_11 = 1;
    settings->PayloadCrcErrorMask_11 = 1;
    settings->ValidHeaderMask_11 = 1;
-   settings-> TxDoneMask_11 = 1;
    settings->CadDoneMask_11=1;
    settings->FhssChangeChannelMask_11 = 1;
    settings->CadDetectedMask_11 = 1;
@@ -309,7 +296,7 @@ void init_LoRaSettings(LoRaSettings *settings){
   
 	settings->LoRa_header_mode = 0;
 	
-	settings->LoRa_packetLength = 5;  //длина пакета
+	settings->LoRa_packetLength = 3;  //длина пакета
 	
 	settings->preambleDetect_1F = 0;
 	
