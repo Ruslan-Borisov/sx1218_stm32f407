@@ -33,7 +33,8 @@
  char rx[] = {"msg_rx"};
 
 
-
+void Lora_receive(char *buff, uint8_t len);
+void Lora_transmit(char *buff, uint8_t len);
 /**/
 void init_LoRaSettings(LoRaSettings *settings);
 
@@ -175,12 +176,12 @@ int main(void)
 				{
 					
 				
-					// Lora_transmit(bufTX, 3);
+					 Lora_transmit(bufTX, 3);
 					 
 				}
 			if(rw_test==3)
 				{
-					//Lora_receive(bufRX, 12);
+					Lora_receive(bufRX, 12);
 					 
 				}
 		  irqFlagUSART1_RX = 0;	
@@ -190,6 +191,18 @@ int main(void)
   }
 }
 
+void Lora_transmit(char *buff, uint8_t len)
+{
+  SX1278_WriteBurst(LR_RegFifo, buff, len);
+
+}
+
+void Lora_receive(char *buff, uint8_t len)
+{
+  //SX1278_WriteSingle(0x0D, 0); 
+  SX1278_ReadBurst(LR_RegFifo, buff, len);
+
+}
 
 
 void init_LoRaSettings(LoRaSettings *settings){
@@ -226,7 +239,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 0x00;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
+	settings->ImplicitHeaderModeOn_1D = 1;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
