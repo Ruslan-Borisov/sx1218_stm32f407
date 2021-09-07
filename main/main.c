@@ -131,6 +131,7 @@ int main(void)
 		 OLED_num_to_str(test_loraset, 5);
 		 LCD_Goto(0,2);
 		 SX1278_standby(&settings);
+		 SX1278_WriteSingle(LR_RegFifoAddrPtr, 0x00);
 		 SX1278_LoRaRxPacket(&settings);  
        SX1278_LoRaEntryRx(&settings, 5, 3000);
 		 irqFlagEXTI_DIO0=0;
@@ -174,12 +175,12 @@ int main(void)
 				{
 					
 				
-					 Lora_transmit(bufTX, 3);
+					// Lora_transmit(bufTX, 3);
 					 
 				}
 			if(rw_test==3)
 				{
-					Lora_receive(bufRX, 12);
+					//Lora_receive(bufRX, 12);
 					 
 				}
 		  irqFlagUSART1_RX = 0;	
@@ -225,7 +226,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 1;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
+	settings->ImplicitHeaderModeOn_1D = 0x00;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
