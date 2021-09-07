@@ -25,16 +25,16 @@
 #include "ic1306.h"
 
 
-#define _SLAVE	
+//#define _SLAVE	
 
-//#define _MASTER
+#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
 
 
-void Lora_receive(char *buff, uint8_t len);
-void Lora_transmit(char *buff, uint8_t len);
+void Lora_receive(uint8_t *buff, uint8_t len);
+void Lora_transmit(uint8_t *buff, uint8_t len);
 /**/
 void init_LoRaSettings(LoRaSettings *settings);
 
@@ -70,7 +70,7 @@ LoRaSettings settings;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-char bufTX[] = {"ST"};
+char bufTX[5] = {5, 10, 15, 0, 0};
 char bufRX[5];
 
 uint16_t gg;
@@ -84,15 +84,10 @@ int main(void)
 		GPIO_Init();
 		EXTI_Init();
 		TIM6_Init();
-   #ifdef _SLAVE
-	 i2c_oled_init();
+		i2c_oled_init();
 		ssd1306_init();
 		LCD_Clear();
-		LCD_Goto(0,0);
-		OLED_string("Lora sx1278 ");
-   #endif
-	
-	
+
 
 
 		LORA_ADD_SET();
@@ -110,10 +105,14 @@ int main(void)
 	
 	
 #ifdef _SLAVE
+		LCD_Goto(0,0);
+		OLED_string("SLAVE");
 	 SX1278_LoRaEntryRx(&settings, 5, 3000);  // ПРИЕМНИК 
 #endif
 
 #ifdef _MASTER
+      LCD_Goto(0,0);
+		OLED_string("MASTER");
 	 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК
 #endif
 
@@ -125,18 +124,35 @@ int main(void)
 	 
 #ifdef _SLAVE   
 /*******************************************************/ 	 
-	 if(irqFlagEXTI_DIO0 == 1){
+	 if(irqFlagEXTI_DIO0 == 1)
+	{
+		 irqFlagEXTI_DIO0=0;
 		 test_loraset++;
-		 LCD_Goto(0,1);
+		 LCD_Goto(0,0);
 		 OLED_string("Lora RECEIVE = ");
 		 OLED_num_to_str(test_loraset, 5);
-		 LCD_Goto(0,2);
 		 SX1278_standby(&settings);
-		 SX1278_WriteSingle(LR_RegFifoAddrPtr, 0x00);
+		 LCD_Goto(0,3);
+	    OLED_string("FIFOadrr = ");
+	    OLED_num_to_str( SX1278_ReadSingle(0x39), 5);
 		 SX1278_LoRaRxPacket(&settings);  
        SX1278_LoRaEntryRx(&settings, 5, 3000);
-		 irqFlagEXTI_DIO0=0;
+		
 	 }
+	 
+	  LCD_Goto(0,1);
+	  OLED_string("RSSI = ");
+	  OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
+	  LCD_Goto(0,2);
+	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[0]), 5); //LR_RegFifoAddrPtr
+	  OLED_string(" ");
+	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[1]), 5); //LR_RegFifoAddrPtr
+	  OLED_string(" ");
+	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[2]), 5); //LR_RegFifoAddrPtr
+	    LCD_Goto(0,4);
+	    OLED_string("FIFOadrr = ");
+	    OLED_num_to_str( SX1278_ReadSingle(0x39), 5);
+	 
 /*******************************************************/	 
 #endif
 	 
@@ -145,18 +161,37 @@ int main(void)
 #ifdef _MASTER   
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
+		 irqFlagEXTI_DIO0=0;
 		 SX1278_ReadSingle(LR_RegIrqFlags);
    	 SX1278_clearLoRaIrq(); //Clear irq
 		 SX1278_standby(&settings); 
+		 SX1278_WriteSingle(LR_RegPayloadLength, 0x00);
 		 test_loraset++;
 		 timDelayMs(1000);
 		 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК  
-	   irqFlagEXTI_DIO0=0;
+	  
 	 }
+	 LCD_Goto(0,1);
+	  OLED_string("RSSI = ");
+	  OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
+	  LCD_Goto(0,2);
+	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[0]), 5); //LR_RegFifoAddrPtr
+	  OLED_string(" ");
+	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[1]), 5); //LR_RegFifoAddrPtr
+	  OLED_string(" ");
+	  OLED_num_to_str( SX1278_ReadSingle(settings.rxBuffer[2]), 5); //LR_RegFifoAddrPtr
+	    LCD_Goto(0,4);
+	    OLED_string("FIFOadrr = ");
+	    OLED_num_to_str( SX1278_ReadSingle(0x39), 5);
 /*******************************************************/	 
 #endif
 	 
 /*******************************************************/
+	 
+	 
+	 
+	 
+	 
 	if(irqFlagUSART1_RX==1)
 		{
 			rw_test = USART1_buff_RX[0];
@@ -176,12 +211,12 @@ int main(void)
 				{
 					
 				
-					 Lora_transmit(bufTX, 3);
+					// Lora_transmit(bufTX, 3);
 					 
 				}
 			if(rw_test==3)
 				{
-					Lora_receive(bufRX, 12);
+				//	Lora_receive(bufRX, 12);
 					 
 				}
 		  irqFlagUSART1_RX = 0;	
@@ -191,13 +226,13 @@ int main(void)
   }
 }
 
-void Lora_transmit(char *buff, uint8_t len)
+void Lora_transmit( uint8_t *buff, uint8_t len)
 {
   SX1278_WriteBurst(LR_RegFifo, buff, len);
 
 }
 
-void Lora_receive(char *buff, uint8_t len)
+void Lora_receive( uint8_t *buff, uint8_t len)
 {
   //SX1278_WriteSingle(0x0D, 0); 
   SX1278_ReadBurst(LR_RegFifo, buff, len);
@@ -208,7 +243,7 @@ void Lora_receive(char *buff, uint8_t len)
 void init_LoRaSettings(LoRaSettings *settings){
 	
 	/*RegFrMsb(0x06), RegFrMid(0x07), RegFrLsb(0x08)*/
-	settings->frequency = 433;           /*Частота задается в МГц*/
+	settings->frequency = 434;           /*Частота задается в МГц*/
 	
    /*RegPaConfig(0x09)*/
 	settings->PaSelect_09    = 0x00;         /*Выбирает выходной вывод PA - Пин-код RFO. Выходная мощность ограничена +14 дБм.
@@ -243,7 +278,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
-	settings->LoRa_ocp_SET_0B = 1;           /*Включает защиту от перегрузки по току (OCP) для PA:
+	settings->LoRa_ocp_SET_0B = 0;           /*Включает защиту от перегрузки по току (OCP) для PA:
                                                    0 - OCP отключен 1 - OCP включен*/
 	/*RegSyncWord(0x39)*/
 	settings->LoRa_SyncWord_39 = 0x20;          /*Слово синхронизации Значение 0x34 зарезервировано для сетей LoRaWAN*/
@@ -275,7 +310,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	settings->Dio_5_0Map_41 = 0;               /*00 - ModeReady, 01 - ClkOut, 10 - ClkOut */
 	
 	/*RegDioMapping1(0x40)*/
-	settings->Dio_0_0Map_40 = 0;                /*00 - RxDone, 01 - TxDone, 10 - CadDone */
+	//settings->Dio_0_0Map_40 = 0;                /*00 - RxDone, 01 - TxDone, 10 - CadDone */
 	settings-> Dio_1_0Map_40 = 0;               /*00 - RxTimeout, 01 - FhssChangeChannel, 10 - CadDetected */
 	settings-> Dio_2_0Map_40 = 0;
 	settings-> Dio_3_0Map_40 = 0;               /*00 - FhssChangeChannel, 01 - FhssChangeChannel, 10 - FhssChangeChannel */
@@ -310,7 +345,7 @@ void init_LoRaSettings(LoRaSettings *settings){
   
 	settings->LoRa_header_mode = 0;
 	
-	settings->LoRa_packetLength = 3;  //длина пакета
+	settings->LoRa_packetLength = 5;  //длина пакета
 	
 	settings->preambleDetect_1F = 0;
 	

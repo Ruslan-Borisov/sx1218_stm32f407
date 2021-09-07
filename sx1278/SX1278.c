@@ -196,7 +196,7 @@ int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 /************************************************************
 *************************************************************/
 
-int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, char *txBuffer, uint8_t length, uint32_t timeout) {
+int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings,  uint8_t *txBuffer, uint8_t length, uint32_t timeout) {
 	  SX1278_WriteBurst(0x00, txBuffer, length);
 	  SX1278_WriteSingle(LR_RegOpMode, 0x8b);	//Tx Mode
 //	  while (1) 
@@ -279,7 +279,7 @@ void SX1278_init()
 /************************************************************
 *************************************************************/
 
-int SX1278_transmit(LoRaSettings *MyLoRaSettings,char *txBuf, uint8_t length, uint32_t timeout)
+int SX1278_transmit(LoRaSettings *MyLoRaSettings, uint8_t *txBuf, uint8_t length, uint32_t timeout)
 {
 	if (SX1278_LoRaEntryTx(MyLoRaSettings, length, timeout))
 		{

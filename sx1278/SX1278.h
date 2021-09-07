@@ -99,9 +99,9 @@ extern "C" {
 #define  RegOcp                 0x0b
 #define  RegLna                 0x0c
 #define  RegRxConfig            0x0d
-#define  RegRssiConfig      	0x0e
-#define  RegRssiCollision 		0x0f
-#define  RegRssiThresh      	0x10
+#define  RegRssiConfig      	  0x0e
+#define  RegRssiCollision 		  0x0f
+#define  RegRssiThresh      	  0x10
 #define  RegRssiValue           0x11
 #define  RegRxBw                0x12
 #define  RegAfcBw               0x13
@@ -264,8 +264,8 @@ typedef struct LoRaSettings {
 	
 	uint8_t preambleDetect_1F;
 	
-	char rxBuffer[SX1278_MAX_PACKET];
-	char txBuffer[SX1278_MAX_PACKET];
+	uint8_t rxBuffer[SX1278_MAX_PACKET];
+	uint8_t txBuffer[SX1278_MAX_PACKET];
 	
 	uint8_t readBytes;
 	
@@ -288,7 +288,7 @@ void SX1278_clearLoRaIrq();
 
 void SX1278_init();
 
-int SX1278_transmit(LoRaSettings *MyLoRaSettings, char *txBuf, uint8_t length, uint32_t timeout);
+int SX1278_transmit(LoRaSettings *MyLoRaSettings,  uint8_t *txBuf, uint8_t length, uint32_t timeout);
 
 uint8_t SX1278_available(LoRaSettings *MyLoRaSettings);
 
@@ -296,7 +296,7 @@ int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeou
 
 uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings);
 
-int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, char *txBuffer, uint8_t length, uint32_t timeout);
+int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings,  uint8_t *txBuffer, uint8_t length, uint32_t timeout);
 
 uint8_t SX1278_LR_RegOcp(LoRaSettings *MyLoRaSettings);
 
