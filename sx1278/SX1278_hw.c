@@ -79,7 +79,6 @@ uint8_t SX1278_WriteSingle(uint8_t command, uint8_t value)
 	while (SPI1->SR & SPI_SR_BSY){};
 	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
 	temp=SPI1_DR_8bit;	
-	SX1278_hw_SetNSS(1);
 	return temp;	
 }
 
@@ -101,7 +100,6 @@ uint8_t SX1278_ReadSingle(uint8_t command)
 	while (SPI1->SR & SPI_SR_BSY){};
 	while (!(SPI1->SR & SPI_SR_RXNE)){};
 	temp = SPI1_DR_8bit;
-	SX1278_hw_SetNSS(1);
 	return temp;	
 }
 
@@ -126,7 +124,6 @@ void SX1278_WriteBurst( uint8_t addr, uint8_t *buff, uint8_t size)
 			while (!(SPI1->SR & SPI_SR_RXNE)){};
 			SPI1_DR_8bit;	
 		}
-	SX1278_hw_SetNSS(1);
 }
 
 /************************************************************
@@ -168,7 +165,6 @@ void SX1278_ReadBurst( uint8_t cmd, uint8_t *buff, uint8_t size)
 			while (SPI1->SR & SPI_SR_BSY){};
 			while (!(SPI1->SR & SPI_SR_RXNE)){}; buff[j_] = SPI1_DR_8bit;		
 		}
-	SX1278_hw_SetNSS(1);
 }
 
 /************************************************************
