@@ -83,12 +83,15 @@ int main(void)
 		GPIO_Init();
 		EXTI_Init();
 		TIM6_Init();
+	   
+	  i2c_oled_init();
+	  ssd1306_init();
+	
    #ifdef _SLAVE
-	 i2c_oled_init();
-		ssd1306_init();
+
 		LCD_Clear();
 		LCD_Goto(0,0);
-		OLED_string("Lora sx1278 ");
+		OLED_string("SLAVE");
    #endif
 	
 	
@@ -109,11 +112,11 @@ int main(void)
 	
 	
 #ifdef _SLAVE
-	 SX1278_LoRaEntryRx(&settings, 5, 3000);  // ПРИЕМНИК 
+	 
 #endif
 
 #ifdef _MASTER
-	 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК
+	 
 #endif
 
 	
@@ -174,12 +177,12 @@ int main(void)
 				{
 					
 				
-					 Lora_transmit(bufTX, 3);
+					// Lora_transmit(bufTX, 3);
 					 
 				}
 			if(rw_test==3)
 				{
-					Lora_receive(bufRX, 12);
+					//Lora_receive(bufRX, 12);
 					 
 				}
 		  irqFlagUSART1_RX = 0;	
@@ -261,7 +264,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	settings->Dio_5_0Map_41 = 0;               /*00 - ModeReady, 01 - ClkOut, 10 - ClkOut */
 	
 	/*RegDioMapping1(0x40)*/
-	settings->Dio_0_0Map_40 = 0;                /*00 - RxDone, 01 - TxDone, 10 - CadDone */
+//	settings->Dio_0_0Map_40 = 0;                /*00 - RxDone, 01 - TxDone, 10 - CadDone */
 	settings-> Dio_1_0Map_40 = 0;               /*00 - RxTimeout, 01 - FhssChangeChannel, 10 - CadDetected */
 	settings-> Dio_2_0Map_40 = 0;
 	settings-> Dio_3_0Map_40 = 0;               /*00 - FhssChangeChannel, 01 - FhssChangeChannel, 10 - FhssChangeChannel */
