@@ -25,8 +25,8 @@ extern "C" {
 /*!
  * SX1278 LoRa General parameters definition
  */
-#define SX1278_MAX_PACKET	10
-#define SX1278_DEFAULT_TIMEOUT		10
+#define SX1278_MAX_PACKET	         256
+#define SX1278_DEFAULT_TIMEOUT		256
 
 //RFM98 Internal registers Address
 /********************LoRa mode***************************/
@@ -264,8 +264,8 @@ typedef struct LoRaSettings {
 	
 	uint8_t preambleDetect_1F;
 	
-	char rxBuffer[SX1278_MAX_PACKET];
-	char txBuffer[SX1278_MAX_PACKET];
+	uint8_t rxBuffer[SX1278_MAX_PACKET];
+	uint8_t txBuffer[SX1278_MAX_PACKET];
 	
 	uint8_t readBytes;
 	
@@ -288,7 +288,7 @@ void SX1278_clearLoRaIrq();
 
 void SX1278_init();
 
-int SX1278_transmit(LoRaSettings *MyLoRaSettings, char *txBuf, uint8_t length, uint32_t timeout);
+int SX1278_transmit(LoRaSettings *MyLoRaSettings, uint8_t *txBuf, uint8_t length, uint32_t timeout);
 
 uint8_t SX1278_available(LoRaSettings *MyLoRaSettings);
 
@@ -296,7 +296,7 @@ int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeou
 
 uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings);
 
-int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, char *txBuffer, uint8_t length, uint32_t timeout);
+int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, uint8_t *txBuffer, uint8_t length, uint32_t timeout);
 
 uint8_t SX1278_LR_RegOcp(LoRaSettings *MyLoRaSettings);
 
@@ -317,8 +317,6 @@ uint8_t SX1278_LR_RegIrqFlagsMask(LoRaSettings *MyLoRaSettings);
 uint8_t SX1278_LR_RegPaConfig(LoRaSettings *MyLoRaSettings);
 
 int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout);
-
-void SX1278_LR_DIOMAPPING1_SET(LoRaSettings *MyLoRaSettings, uint8_t DIO0_map, uint8_t DIO1_map);
 
 uint8_t SX1278_read(LoRaSettings *MyLoRaSettings);
 

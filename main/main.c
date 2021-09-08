@@ -25,9 +25,9 @@
 #include "ic1306.h"
 
 
-#define _SLAVE	
+//#define _SLAVE	
 
-//#define _MASTER
+#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
@@ -69,8 +69,8 @@ LoRaSettings settings;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-char bufTX[] = {"ST"};
-char bufRX[5];
+uint8_t bufTX[3] = {0x1, 0x2, 0x3};
+uint8_t bufRX[3];
 
 uint16_t gg;
 
@@ -86,17 +86,9 @@ int main(void)
 	   
 	  i2c_oled_init();
 	  ssd1306_init();
-	
-   #ifdef _SLAVE
-
 		LCD_Clear();
 		LCD_Goto(0,0);
-		OLED_string("SLAVE");
-   #endif
-	
-	
-
-
+   
 		LORA_ADD_SET();
 		timDelayMs(100);
 		SX1278_hw_init();
@@ -106,17 +98,16 @@ int main(void)
 
 		init_LoRaSettings(&settings);
 		SX1278_config(&settings);
-		SX1278_clearLoRaIrq();
-		irqFlagEXTI_DIO0=0;
 	
+		 
 	
 	
 #ifdef _SLAVE
-	 
+	 OLED_string("SLAVE");
 #endif
 
 #ifdef _MASTER
-	 
+	  OLED_string("MASTER");
 #endif
 
 	
@@ -127,15 +118,29 @@ int main(void)
 	 
 #ifdef _SLAVE   
 /*******************************************************/ 	 
-	 if(irqFlagEXTI_DIO0 == 1){
+	    if(irqFlagEXTI_DIO0 == 0)
+		 SX1278_receive(&settings,3, 3000);  // ПЕРЕДАТЧИК  
+	    if(irqFlagEXTI_DIO0 == 1){
 		 test_loraset++;
 		 LCD_Goto(0,1);
 		 OLED_string("Lora RECEIVE = ");
 		 OLED_num_to_str(test_loraset, 5);
 		 LCD_Goto(0,2);
-		 SX1278_standby(&settings);
-		 SX1278_LoRaRxPacket(&settings);  
-       SX1278_LoRaEntryRx(&settings, 5, 3000);
+		 OLED_string("RSSI = ");
+		 OLED_num_to_str( SX1278_RSSI(), 5);
+		 LCD_Goto(0,3);
+		 OLED_string("RSSI_LoRa = ");
+		 OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
+		 
+		 LCD_Goto(0,4); 
+		 OLED_string("1= "); 
+		 OLED_num_to_str(settings.rxBuffer[0], 5);
+		 OLED_string("2= ");
+		 OLED_num_to_str(settings.rxBuffer[1], 5);
+		 OLED_string("3= ");
+		 OLED_num_to_str(settings.rxBuffer[2], 5);
+			 
+       SX1278_available(&settings);
 		 irqFlagEXTI_DIO0=0;
 	 }
 /*******************************************************/	 
@@ -145,15 +150,19 @@ int main(void)
 	 
 #ifdef _MASTER   
 /*******************************************************/ 	 
-	 if(irqFlagEXTI_DIO0 == 1){
-		 SX1278_ReadSingle(LR_RegIrqFlags);
-   	 SX1278_clearLoRaIrq(); //Clear irq
-		 SX1278_standby(&settings); 
-		 test_loraset++;
-		 timDelayMs(1000);
-		 SX1278_transmit(&settings, bufTX, 5, 3000);  // ПЕРЕДАТЧИК  
-	   irqFlagEXTI_DIO0=0;
-	 }
+//	 if(irqFlagEXTI_DIO0 == 0)
+//		 {
+//			 SX1278_transmit(&settings, bufTX, 3, 3000);  // ПЕРЕДАТЧИК  
+//		 }
+//	 if(irqFlagEXTI_DIO0 == 1){
+//		 test_loraset++;
+//		 LCD_Goto(0,1);
+//		 OLED_string("Lora RECEIVE = ");
+//		 OLED_num_to_str(test_loraset, 5);
+//		 LCD_Goto(0,2);
+//	    irqFlagEXTI_DIO0=0;
+//		 timDelayMs(3000);
+//	 }
 /*******************************************************/	 
 #endif
 	 
@@ -177,12 +186,12 @@ int main(void)
 				{
 					
 				
-					// Lora_transmit(bufTX, 3);
+				SX1278_WriteBurst( cmd_test,bufRX, 3);
 					 
 				}
 			if(rw_test==3)
 				{
-					//Lora_receive(bufRX, 12);
+					SX1278_ReadBurst(cmd_test,bufRX, 3);
 					 
 				}
 		  irqFlagUSART1_RX = 0;	
@@ -228,7 +237,7 @@ void init_LoRaSettings(LoRaSettings *settings){
 	
 	settings->LoRa_CodingRate_1D = 0x01;      /*Скорость кодирования ошибок в полосе пропускания сигнала*/
 	
-	settings->ImplicitHeaderModeOn_1D = 1;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
+	settings->ImplicitHeaderModeOn_1D = 0;    // 1 -  не явный режим заголовка 0 - явный режим заголовка
 	
 	/*RegOcp (0x0B)*/
 	settings->LoRa_ocp_Imax_0B = 100;          /*мА, максимальное значение тока перегрузки*/
@@ -244,7 +253,7 @@ void init_LoRaSettings(LoRaSettings *settings){
                                                       11 - Увеличение, ток 150% LNA*/
 	
 	/*RegModemConfig3(0x26)*/
-	settings->LoRa_LDRateOptimize_26 = 1;      /*Оптимизация ризкой скорости передачи данных 0 -Отключено
+	settings->LoRa_LDRateOptimize_26 = 0;      /*Оптимизация ризкой скорости передачи данных 0 -Отключено
                                                      1 - Включено; требуется, если длина символа превышает 16 м*/
 	settings->LoRa_AgcAutoOn_26 = 0;           /*0 - Коэффициент усиления LNA, установленный регистром LnaGain
                                                       1 - Коэффициент усиления LNA, установленный внутренним контуром AGC*/

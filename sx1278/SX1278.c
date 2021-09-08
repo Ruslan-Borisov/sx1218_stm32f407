@@ -122,9 +122,10 @@ int SX1278_LoRaEntryRx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 	
 	//SX1278_WriteSingle(LR_RegOpMode,0x05);	
 	MyLoRaSettings->readBytes = 0;
+	
 	while (1) 
 		{
-			if((SX1278_ReadSingle(LR_RegModemStat) & 0x04) == 0x04) 
+			if(irqFlagEXTI_DIO0==1) 
 				{	
 					MyLoRaSettings->status = RX;
 					return 1;
@@ -161,7 +162,7 @@ uint8_t SX1278_LoRaRxPacket(LoRaSettings *MyLoRaSettings){
 				{
 					packet_size = SX1278_ReadSingle(LR_RegRxNbBytes); //Number for received bytes
 				}
-			SX1278_ReadBurst(0x00, MyLoRaSettings->rxBuffer, packet_size);
+			SX1278_ReadBurst(0x00, MyLoRaSettings->rxBuffer,packet_size);
 			MyLoRaSettings->readBytes = packet_size;
 			SX1278_clearLoRaIrq();	
 	  	return MyLoRaSettings->readBytes;
@@ -191,9 +192,11 @@ int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 	
 	SX1278_WriteSingle(LR_RegPayloadLength, length); //RegPayloadLength 21byte
 	
-	addr = SX1278_ReadSingle(LR_RegFifoTxBaseAddr); //RegFiFoTxBaseAddr
+	SX1278_WriteSingle(LR_RegFifoTxBaseAddr, 0x0); 
 	
-	SX1278_WriteSingle(LR_RegFifoAddrPtr, addr); //RegFifoAddrPtr
+	SX1278_WriteSingle(LR_RegFifoRxBaseAddr, 0x0); 
+	
+	
 
 	while(1) 
 		{
@@ -218,7 +221,7 @@ int SX1278_LoRaEntryTx(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t ti
 /************************************************************
 *************************************************************/
 
-int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, char *txBuffer, uint8_t length, uint32_t timeout) {
+int SX1278_LoRaTxPacket(LoRaSettings *MyLoRaSettings, uint8_t *txBuffer, uint8_t length, uint32_t timeout) {
 	 SX1278_WriteBurst(0x00, txBuffer, length);
 	 SX1278_WriteSingle(LR_RegOpMode, 0x8b);	//Tx Mode
     while (1) 
@@ -300,7 +303,7 @@ void SX1278_init()
 /************************************************************
 *************************************************************/
 
-int SX1278_transmit(LoRaSettings *MyLoRaSettings,char *txBuf, uint8_t length, uint32_t timeout)
+int SX1278_transmit(LoRaSettings *MyLoRaSettings, uint8_t *txBuf, uint8_t length, uint32_t timeout)
 {
 	if (SX1278_LoRaEntryTx(MyLoRaSettings, length, timeout))
 		{
@@ -314,7 +317,7 @@ int SX1278_transmit(LoRaSettings *MyLoRaSettings,char *txBuf, uint8_t length, ui
 
 int SX1278_receive(LoRaSettings *MyLoRaSettings, uint8_t length, uint32_t timeout)
 {
-	return SX1278_LoRaEntryTx(MyLoRaSettings, length,  timeout) ;
+	return SX1278_LoRaEntryRx(MyLoRaSettings, length,  timeout) ;
 }
 
 /************************************************************
@@ -451,13 +454,6 @@ uint8_t SX1278_LR_RegPaConfig(LoRaSettings *MyLoRaSettings)
 	temp = (MyLoRaSettings->PaSelect_09 << 7)+(MyLoRaSettings->MaxPower_09 <<4)+
 					(MyLoRaSettings->OutputPower_09);
   return temp;
-}
-/************************************************************
-*************************************************************/
-void SX1278_LR_DIOMAPPING1_SET(LoRaSettings *MyLoRaSettings, uint8_t DIO0_map, uint8_t DIO1_map)
-{  
-	MyLoRaSettings->Dio_0_0Map_40 = DIO0_map; 
-	MyLoRaSettings->Dio_1_0Map_40 = DIO1_map; 
 }
 
 
