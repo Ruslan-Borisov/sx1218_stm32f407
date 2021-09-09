@@ -79,7 +79,8 @@ uint8_t SX1278_WriteSingle(uint8_t command, uint8_t value)
 	while (SPI1->SR & SPI_SR_BSY){};
 	while (!(SPI1->SR & SPI_SR_RXNE)){}; 
 	temp=SPI1_DR_8bit;	
-	return temp;	
+	return temp;
+		
 }
 
 /************************************************************

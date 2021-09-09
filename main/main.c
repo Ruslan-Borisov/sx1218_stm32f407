@@ -25,9 +25,9 @@
 #include "ic1306.h"
 
 
-#define _SLAVE	
+//#define _SLAVE	
 
-//#define _MASTER
+#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
@@ -121,14 +121,31 @@ int main(void)
 		 LCD_Goto(0,1);
 		 OLED_string("Lora RECEIVE = ");
 		 OLED_num_to_str(test_loraset, 5);
+		 LCD_Goto(0,2);
+	    irqFlagEXTI_DIO0=0;
+		 bufRX[0] = SX1278.rxBuffer[0];
+		 OLED_string(" ");
+		 OLED_num_to_str( bufRX[0] , 5);
+		 bufRX[1] = SX1278.rxBuffer[1];
+		 OLED_string(" ");
+		 OLED_num_to_str( bufRX[1] , 5);
+		 bufRX[2] = SX1278.rxBuffer[2];
+		 OLED_string(" ");
+		 OLED_num_to_str( bufRX[2] , 5);
+		 
+		 LCD_Goto(0,3);
+	    OLED_string("RSSI_LoRa= "); 
+		 OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
+			
+       LCD_Goto(0,4);
+	    OLED_string("RSSI= "); 
+		 OLED_num_to_str(SX1278_RSSI(), 5);			 
+			 
 		 irqFlagEXTI_DIO0=0;
 		 SX1278_receive(&SX1278, 3, 10000);
 	 }
-		 testcounter++;
-	    LCD_Goto(0,2);
-		 OLED_num_to_str(testcounter, 5);
-	    LCD_Goto(0,3);
-		 OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
+
+	  
 /*******************************************************/	 
 #endif
 	 
@@ -141,14 +158,17 @@ int main(void)
 		 LCD_Goto(0,1);
 		 OLED_string("Lora RECEIVE = ");
 		 OLED_num_to_str(test_loraset, 5);
-		 LCD_Goto(0,2);
-	    irqFlagEXTI_DIO0=0;
+		
+		 
+	
 		 timDelayMs(1000);
+		 
+		  irqFlagEXTI_DIO0=0;
 		 SX1278_transmit(&SX1278, bufTX, 3,  2000);	
 
 	 }
 	    testcounter++;
-	    LCD_Goto(0,2);
+	    LCD_Goto(0,3);
 		 OLED_num_to_str(testcounter, 5);
 /*******************************************************/	 
 #endif
