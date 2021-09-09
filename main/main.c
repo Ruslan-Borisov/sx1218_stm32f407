@@ -25,9 +25,9 @@
 #include "ic1306.h"
 
 
-//#define _SLAVE	
+#define _SLAVE	
 
-#define _MASTER
+//#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
@@ -95,7 +95,7 @@ int main(void)
 		spi_master_init();	
 		timDelayMs(1000);
 	
-      SX1278_init(&SX1278, 433000000, 100, SX1278_LORA_SF_7, SX1278_LORA_BW_125KHZ,
+      SX1278_init(&SX1278, 433000000, SX1278_POWER_20DBM	, SX1278_LORA_SF_7, SX1278_LORA_BW_125KHZ,
 						SX1278_LORA_CR_4_6, SX1278_LORA_CRC_DIS, 6);
 	
 		 

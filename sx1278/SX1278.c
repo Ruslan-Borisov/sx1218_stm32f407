@@ -153,6 +153,8 @@ int SX1278_LoRaEntryRx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 	SX1278_SPIWrite(LR_RegFifoAddrPtr, addr); //RxBaseAddr->FiFoAddrPtr
 
 	SX1278_SPIWrite(LR_RegOpMode, 0x8d);	//Mode//Low Frequency Mode
+	
+	//SX1278_SPIWrite(LR_RegOpMode, 0x85);	//Mode//high Frequency Mode
 	//SX1278_SPIWrite(module, LR_RegOpMode,0x05);	//Continuous Rx Mode //High Frequency Mode
 	module->readBytes = 0;
 
@@ -232,7 +234,11 @@ int SX1278_LoRaEntryTx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 int SX1278_LoRaTxPacket(SX1278_t *module, uint8_t *txBuffer, uint8_t length,
 		uint32_t timeout) {
 	SX1278_SPIBurstWrite(0x00, txBuffer, length);
+			
 	SX1278_SPIWrite(LR_RegOpMode, 0x8b);	//Tx Mode
+	
+  // SX1278_SPIWrite(LR_RegOpMode, 0x83);	//Tx Mode	high		
+			
 	while (1) {
 		if (irqFlagEXTI_DIO0 == 1) { //if(Get_NIRQ()) //Packet send over
 			SX1278_SPIRead(LR_RegIrqFlags);
