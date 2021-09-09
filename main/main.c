@@ -69,8 +69,8 @@ uint8_t testcounter;
 /**/
 char text_RX[] = "DATA_INPUT";
 /**/
-uint8_t bufTX[3] = {0x1, 0x2, 0x3};
-uint8_t bufRX[3];
+uint8_t bufTX[6] = {0x1, 0x2, 0x3};
+uint8_t bufRX[6];
 
 uint16_t gg;
 
@@ -96,19 +96,19 @@ int main(void)
 		timDelayMs(1000);
 	
       SX1278_init(&SX1278, 433000000, 100, SX1278_LORA_SF_7, SX1278_LORA_BW_125KHZ,
-						SX1278_LORA_CR_4_6, SX1278_LORA_CRC_DIS, 3);
+						SX1278_LORA_CR_4_6, SX1278_LORA_CRC_DIS, 6);
 	
 		 
 	
 	
 #ifdef _SLAVE
 	 OLED_string("SLAVE");
-	 SX1278_receive(&SX1278, 3, 10000);
+	 SX1278_receive(&SX1278, 6, 10000);
 #endif
 
 #ifdef _MASTER
 	  OLED_string("MASTER");
-	  SX1278_transmit(&SX1278, bufTX, 3,  2000);	
+	  SX1278_transmit(&SX1278, bufTX, 6,  2000);	
 #endif
 
 	 while (1)
@@ -117,6 +117,7 @@ int main(void)
 #ifdef _SLAVE   
 /*******************************************************/ 	 
 	    if(irqFlagEXTI_DIO0 == 1){
+		 SX1278_LoRaRxPacket(&SX1278);
 		 test_loraset++;
 		 LCD_Goto(0,1);
 		 OLED_string("Lora RECEIVE = ");
@@ -139,12 +140,17 @@ int main(void)
 			
        LCD_Goto(0,4);
 	    OLED_string("RSSI= "); 
-		 OLED_num_to_str(SX1278_RSSI(), 5);			 
-			 
+		 OLED_num_to_str(SX1278_RSSI(), 5);
+     
+   
 		 irqFlagEXTI_DIO0=0;
-		 SX1278_receive(&SX1278, 3, 10000);
+		 LCD_Goto(0,5);
+		 OLED_num_to_str(SX1278_receive(&SX1278, 6, 10000), 5); 
+		 
+//		 OLED_string(" ");
+//		 OLED_num_to_str(SX1278_SPIRead(LR_RegFifoRxByteAddr), 5);
 	 }
-
+     
 	  
 /*******************************************************/	 
 #endif
@@ -155,21 +161,33 @@ int main(void)
 /*******************************************************/ 	 
 	 if(irqFlagEXTI_DIO0 == 1){
 		 test_loraset++;
+		 bufTX[0] = test_loraset;
 		 LCD_Goto(0,1);
-		 OLED_string("Lora RECEIVE = ");
+		 OLED_string("Lora Transmit = ");
 		 OLED_num_to_str(test_loraset, 5);
-		
+		 LCD_Goto(0,2);
+		 OLED_string("AddrPtr = ");
 		 
-	
+		 OLED_num_to_str(SX1278_SPIRead(LR_RegFifoAddrPtr), 5);
+		 LCD_Goto(0,3);
+		 
+		 OLED_string("PLth = ");
+		 
+		 OLED_num_to_str(SX1278_SPIRead(LR_RegPayloadLength), 5);
+		
+	  
 		 timDelayMs(1000);
 		 
 		  irqFlagEXTI_DIO0=0;
-		 SX1278_transmit(&SX1278, bufTX, 3,  2000);	
-
+		 SX1278_transmit(&SX1278, bufTX, 6,  2000);	
+		 LCD_Goto(0,4);
+       OLED_num_to_str( SX1278_transmit(&SX1278, bufTX, 6,  2000), 5);
 	 }
+	   
 	    testcounter++;
-	    LCD_Goto(0,3);
-		 OLED_num_to_str(testcounter, 5);
+	  
+	 
+	 
 /*******************************************************/	 
 #endif
 	 
