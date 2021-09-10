@@ -157,7 +157,7 @@ extern "C" {
 #define SX1278_POWER_14DBM		2
 #define SX1278_POWER_11DBM		3
 
-static const uint8_t SX1278_Power[4] = { 0xFF, //20dbm
+static const uint8_t SX1278_Power[4] = { 0xFF, //20dbm 0xFF def
 		0xFC, //17dbm
 		0xF9, //14dbm
 		0xF6, //11dbm
