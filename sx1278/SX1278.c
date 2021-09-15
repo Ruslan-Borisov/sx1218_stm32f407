@@ -208,7 +208,7 @@ int SX1278_LoRaEntryTx(SX1278_t *module, uint8_t length, uint32_t timeout) {
 	//SX1278_config(module); //setting base parameter
 	SX1278_SPIWrite(REG_LR_PADAC, 0x87);	//Tx for 20dBm
 	SX1278_SPIWrite(LR_RegHopPeriod, 0x00); //RegHopPeriod NO FHSS
-	SX1278_SPIWrite(REG_LR_DIOMAPPING1, 0x40); //DIO0=01, DIO1=00,DIO2=00, DIO3=01
+	SX1278_SPIWrite(REG_LR_DIOMAPPING1, 0x40); //DIO0=01, DIO1=00,DIO2=00, DIO3=00
 	SX1278_clearLoRaIrq(module);
 	SX1278_SPIWrite(LR_RegIrqFlagsMask, 0xF7); //Open TxDone interrupt
 	SX1278_SPIWrite(LR_RegPayloadLength, length); //RegPayloadLength 21byte
@@ -307,9 +307,10 @@ uint8_t SX1278_read(SX1278_t *module, uint8_t *rxBuf, uint8_t length) {
 /************************************************************
 *************************************************************/
 uint8_t SX1278_RSSI_LoRa() {
-	uint32_t temp = 10;
-	temp = SX1278_SPIRead(LR_RegRssiValue); //Read RegRssiValue, Rssi value
-	temp = temp + 127 - 137; //127:Max RSSI, 137:RSSI offset
+	uint16_t temp = 0;
+	uint8_t rssi =0;
+	rssi = SX1278_SPIRead(LR_RegRssiValue); //Read RegRssiValue, Rssi value
+	temp = (-157 + rssi)*(-1); //
 	return (uint8_t) temp;
 }
 /************************************************************

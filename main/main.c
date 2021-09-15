@@ -25,9 +25,9 @@
 #include "ic1306.h"
 
 
-//#define _SLAVE	
+#define _SLAVE	
 
-#define _MASTER
+//#define _MASTER
 
  char tx[] = {"msg_tx"};
  char rx[] = {"msg_rx"};
@@ -85,7 +85,9 @@ int main(void)
 		TIM6_Init();
 	   
 	   i2c_oled_init();
+	   timDelayMs(1);
 	   ssd1306_init();
+	   timDelayMs(1);
 		LCD_Clear();
 		LCD_Goto(0,0);
    
@@ -133,19 +135,16 @@ int main(void)
 		 bufRX[2] = SX1278.rxBuffer[2];
 		 OLED_string(" ");
 		 OLED_num_to_str( bufRX[2] , 5);
-		 
 		 LCD_Goto(0,3);
 	    OLED_string("RSSI_LoRa= "); 
+		 OLED_string("-");
 		 OLED_num_to_str(SX1278_RSSI_LoRa(), 5);
-			
-       LCD_Goto(0,4);
-	    OLED_string("RSSI= "); 
-		 OLED_num_to_str(SX1278_RSSI(), 5);
-     
-   
+		 OLED_string(" dBm"); 
+		 LCD_Goto(0,4);
+		 OLED_string("SNR = "); 
+		 OLED_num_to_str(SX1278_SPIRead(LR_RegPktSnrValue), 5);
 		 irqFlagEXTI_DIO0=0;
-		 LCD_Goto(0,5);
-		 OLED_num_to_str(SX1278_receive(&SX1278, 6, 10000), 5); 
+		 SX1278_receive(&SX1278, 6, 10000);
 		 
 //		 OLED_string(" ");
 //		 OLED_num_to_str(SX1278_SPIRead(LR_RegFifoRxByteAddr), 5);
@@ -166,26 +165,12 @@ int main(void)
 		 OLED_string("Lora Transmit = ");
 		 OLED_num_to_str(test_loraset, 5);
 		 LCD_Goto(0,2);
-		 OLED_string("AddrPtr = ");
-		 
-		 OLED_num_to_str(SX1278_SPIRead(LR_RegFifoAddrPtr), 5);
-		 LCD_Goto(0,3);
-		 
-		 OLED_string("PLth = ");
-		 
-		 OLED_num_to_str(SX1278_SPIRead(LR_RegPayloadLength), 5);
-		
-	  
-		 timDelayMs(1500);
-		 
-		  irqFlagEXTI_DIO0=0;
+	    OLED_string("RSSI_LoRa= "); 
+		 timDelayMs(1000);
+		 irqFlagEXTI_DIO0=0;
 		 SX1278_transmit(&SX1278, bufTX, 6,  1000);	
-		 LCD_Goto(0,4);
-       OLED_num_to_str( SX1278_transmit(&SX1278, bufTX, 6,  2000), 5);
+	
 	 }
-	   
-	    testcounter++;
-	  
 	 
 	 
 /*******************************************************/	 
